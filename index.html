@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CoatCraft">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0e0f11">
+<meta name="description" content="CoatCraft PRO — Paint & Coatings Formulation Management">
+<title>CoatCraft PRO</title>
+
+<!-- Inline Web App Manifest (works on HTTPS hosting) -->
+<link rel="manifest" id="pwa-manifest">
+
+<!-- Favicon SVG -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Crect width='128' height='128' rx='24' fill='%230e0f11'/%3E%3Crect x='20' y='18' width='88' height='92' rx='8' fill='none' stroke='%23e8a020' stroke-width='5'/%3E%3Cline x1='35' y1='42' x2='93' y2='42' stroke='%23e8a020' stroke-width='4' stroke-linecap='round'/%3E%3Cline x1='35' y1='58' x2='93' y2='58' stroke='%23e8a020' stroke-width='4' stroke-linecap='round' opacity='0.7'/%3E%3Cline x1='35' y1='74' x2='75' y2='74' stroke='%23e8a020' stroke-width='4' stroke-linecap='round' opacity='0.5'/%3E%3Ccircle cx='93' cy='88' r='12' fill='%23e8a020'/%3E%3Cpath d='M89 88 L92 91 L97 85' stroke='%230e0f11' stroke-width='2.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+<!-- Apple Touch Icon (generated at runtime as real PNG) -->
+<link rel="apple-touch-icon" id="apple-icon">
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════ APP VARIABLES ═══════════════════════ */
+:root{
+  --bg:#0e0f11;--surface:#16181c;--surface2:#1e2128;--surface3:#252830;
+  --border:#2e3038;--border2:#3a3d48;
+  --accent:#e8a020;--accent2:#f0b840;--accent-dim:rgba(232,160,32,0.15);
+  --green:#3ecf8e;--green-dim:rgba(62,207,142,0.12);
+  --red:#f05252;--red-dim:rgba(240,82,82,0.12);
+  --blue:#5b9cf6;--blue-dim:rgba(91,156,246,0.12);
+  --purple:#a78bfa;--purple-dim:rgba(167,139,250,0.12);
+  --text:#e8eaf0;--text2:#9ba3b5;--text3:#636878;
+  --radius:12px;--radius-sm:8px;--shadow:0 4px 24px rgba(0,0,0,0.5);
+  --sidebar-w:260px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+
+/* ── TOPBAR ── */
+.topbar{height:58px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;z-index:100}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--accent);line-height:1;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.logo-icon{width:28px;height:28px;background:var(--accent-dim);border:1px solid var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.logo span{color:var(--text2)}
+.tdivider{width:1px;height:28px;background:var(--border)}
+.nav-tabs{display:flex;gap:4px;flex:1;overflow-x:auto;scrollbar-width:none}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{padding:7px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;border:none;background:none;display:flex;align-items:center;gap:6px}
+.nav-tab:hover{background:var(--surface2);color:var(--text)}
+.nav-tab.active{background:var(--accent-dim);color:var(--accent)}
+.hamburger{display:none;background:none;border:none;color:var(--text);font-size:22px;cursor:pointer;padding:4px;flex-shrink:0}
+
+/* ── LAYOUT ── */
+.app-body{display:flex;flex:1;overflow:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:transform .25s ease}
+.sidebar-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.sidebar-title{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase}
+.btn-new{background:var(--accent);color:#0e0f11;border:none;border-radius:6px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .15s}
+.btn-new:hover{background:var(--accent2)}
+.search-box{padding:10px 14px;border-bottom:1px solid var(--border)}
+.search-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:8px 12px;font-size:13px;outline:none;transition:border-color .15s}
+.search-input:focus{border-color:var(--accent)}
+.search-input::placeholder{color:var(--text3)}
+.sidebar-list{flex:1;overflow-y:auto;padding:6px}
+.sidebar-list::-webkit-scrollbar{width:3px}
+.sidebar-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.list-item{padding:9px 11px;border-radius:var(--radius-sm);cursor:pointer;transition:background .12s;margin-bottom:1px;border-left:3px solid transparent}
+.list-item:hover{background:var(--surface2)}
+.list-item.active{background:var(--accent-dim);border-left-color:var(--accent)}
+.list-item-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item-meta{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* ── BADGES ── */
+.badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.4px}
+.badge-green{background:var(--green-dim);color:var(--green)}
+.badge-amber{background:var(--accent-dim);color:var(--accent)}
+.badge-blue{background:var(--blue-dim);color:var(--blue)}
+.badge-red{background:var(--red-dim);color:var(--red)}
+.badge-purple{background:var(--purple-dim);color:var(--purple)}
+
+/* ── MAIN ── */
+.main{flex:1;overflow-y:auto;overflow-x:hidden;padding:24px}
+.main::-webkit-scrollbar{width:5px}
+.main::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── DASHBOARD ── */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:28px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.amber::before{background:var(--accent)}
+.stat-card.green::before{background:var(--green)}
+.stat-card.blue::before{background:var(--blue)}
+.stat-icon{font-size:22px;margin-bottom:8px}
+.stat-value{font-family:'Bebas Neue',sans-serif;font-size:40px;color:var(--text);line-height:1}
+.stat-label{font-size:11px;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:1px}
+
+.sec-title{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-bottom:12px;margin-top:26px}
+.sec-title:first-of-type{margin-top:0}
+
+/* ── TABLES ── */
+.tbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:24px}
+table{width:100%;border-collapse:collapse}
+thead tr{border-bottom:1px solid var(--border)}
+th{padding:11px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;background:var(--surface)}
+td{padding:11px 14px;font-size:13px;color:var(--text2);border-bottom:1px solid var(--border)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--surface2)}
+td strong{color:var(--text);font-weight:500}
+
+/* ── FORMS ── */
+.f-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:18px}
+.f-panel-title{font-size:15px;font-weight:600;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.f-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg.full{grid-column:1/-1}
+label{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.5px;text-transform:uppercase}
+input,select,textarea{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:9px 11px;font-size:13px;font-family:inherit;outline:none;transition:border-color .15s;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+input::placeholder,textarea::placeholder{color:var(--text3)}
+select option{background:var(--surface2)}
+textarea{resize:vertical;min-height:78px}
+
+/* ── INGREDIENT TABLE IN FORM ── */
+.ingr-tbl-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:visible}
+.ingr-tbl th{background:var(--surface3);font-size:10px}
+.ingr-tbl td{vertical-align:middle;padding:6px 8px}
+.ingr-tbl input,.ingr-tbl select{background:transparent;border:none;padding:5px 7px;border-radius:4px;font-size:12.5px}
+.ingr-tbl input:focus,.ingr-tbl select:focus{background:var(--surface3);border:1px solid var(--accent)}
+
+/* ── AUTOCOMPLETE ── */
+.ac-wrap{position:relative}
+.ac-list{position:absolute;top:100%;left:0;right:0;background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-sm);z-index:1000;max-height:180px;overflow-y:auto;box-shadow:var(--shadow);display:none}
+.ac-item{padding:8px 12px;font-size:13px;cursor:pointer;color:var(--text);display:flex;justify-content:space-between;align-items:center}
+.ac-item:hover{background:var(--accent-dim)}
+.ac-price{color:var(--accent);font-size:11px;font-family:'DM Mono',monospace}
+
+/* ── BUTTONS ── */
+.bi{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px 7px;border-radius:6px;transition:all .15s}
+.bi:hover{background:var(--red-dim);color:var(--red)}
+.bi.add:hover{background:var(--green-dim);color:var(--green)}
+.btn-row{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.btn{padding:9px 18px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.bp{background:var(--accent);color:#0e0f11}.bp:hover{background:var(--accent2)}
+.bs{background:var(--surface3);color:var(--text);border:1px solid var(--border2)}.bs:hover{background:var(--surface2)}
+.bd{background:var(--red-dim);color:var(--red);border:1px solid rgba(240,82,82,.3)}.bd:hover{background:rgba(240,82,82,.25)}
+.bg-btn{background:var(--green-dim);color:var(--green);border:1px solid rgba(62,207,142,.3)}.bg-btn:hover{background:rgba(62,207,142,.25)}
+.bpdf{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(91,156,246,.3)}.bpdf:hover{background:rgba(91,156,246,.22)}
+.bpur{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(167,139,250,.3)}.bpur:hover{background:rgba(167,139,250,.22)}
+
+/* ── DETAIL HEADER ── */
+.dh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;gap:14px;flex-wrap:wrap}
+.dt{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:1px;line-height:1}
+.ds{font-size:13px;color:var(--text3);margin-top:4px}
+.da{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
+
+/* ── INFO CARDS ── */
+.ig{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:10px;margin-bottom:18px}
+.ic{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px}
+.ic-lbl{font-size:10px;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px;font-weight:600}
+.ic-val{font-size:14px;font-weight:500;color:var(--text)}
+
+/* ── STATUS TIMELINE ── */
+.stl{display:flex;margin:16px 0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.st-step{flex:1;padding:10px 6px;text-align:center;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;color:var(--text3);background:var(--surface);border-right:1px solid var(--border)}
+.st-step:last-child{border-right:none}
+.st-step.active{background:var(--accent-dim);color:var(--accent)}
+.st-step.done{background:var(--green-dim);color:var(--green)}
+
+/* ── TOAST ── */
+.toast-c{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--surface3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:11px 16px;font-size:13px;color:var(--text);box-shadow:var(--shadow);animation:sIn .2s ease;max-width:300px}
+.toast.success{border-left:3px solid var(--green)}
+.toast.error{border-left:3px solid var(--red)}
+@keyframes sIn{from{transform:translateX(16px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ── MODALS ── */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:500;align-items:center;justify-content:center;padding:20px}
+.mo.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:26px;width:100%;box-shadow:var(--shadow)}
+.modal-sm{max-width:440px}
+.modal-lg{max-width:600px}
+.modal-title{font-size:17px;font-weight:600;margin-bottom:10px}
+.modal-body{color:var(--text2);font-size:13.5px;margin-bottom:22px;line-height:1.6}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end}
+
+/* ── MISC ── */
+.pbar-wrap{background:var(--surface3);border-radius:4px;height:5px;margin-top:5px}
+.pbar{height:100%;border-radius:4px;background:var(--accent);transition:width .3s}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;background:var(--surface3);color:var(--text2)}
+.info-banner{background:var(--blue-dim);border:1px solid rgba(91,156,246,.3);border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:18px;font-size:13px;color:var(--blue)}
+.warn-banner{background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.3);border-radius:var(--radius-sm);padding:11px 14px;margin-bottom:18px;font-size:13px;color:var(--accent)}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text3);font-size:13px}
+
+/* ── PWA INSTALL BANNER ── */
+#install-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:14px 20px;z-index:800;flex-direction:row;align-items:center;gap:14px;box-shadow:0 -4px 20px rgba(0,0,0,.4)}
+#install-banner.show{display:flex}
+.install-icon{width:44px;height:44px;background:linear-gradient(135deg,#1a1c22,#0e0f11);border:1px solid var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.install-text{flex:1}
+.install-title{font-weight:600;font-size:14px}
+.install-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.ig-step{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;font-size:13px;line-height:1.5}
+
+/* print media — only used as fallback; PDFs open in popup window */
+@media print{body{display:none}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .hamburger{display:block}
+  .sidebar{position:fixed;top:58px;left:0;bottom:0;z-index:200;transform:translateX(-100%);box-shadow:4px 0 20px rgba(0,0,0,.5)}
+  .sidebar.open{transform:translateX(0)}
+  .tdivider,.nav-tabs{display:none}
+  .main{padding:14px}
+  .f-grid{grid-template-columns:1fr}
+  .dash-grid{grid-template-columns:1fr 1fr}
+  .dh{flex-direction:column}
+  .ig{grid-template-columns:1fr 1fr}
+  .st-step{font-size:9.5px;padding:9px 3px}
+}
+@media(max-width:400px){.logo-text{display:none}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <button class="hamburger" onclick="toggleSidebar()">☰</button>
+  <div class="logo">
+    <div class="logo-icon">🎨</div>
+    <span class="logo-text">CoatCraft <span>PRO</span></span>
+  </div>
+  <div class="tdivider"></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('dashboard')" id="tab-dashboard">🏠 Dashboard</button>
+    <button class="nav-tab" onclick="showPage('formulations')" id="tab-formulations">🧪 Formulations</button>
+    <button class="nav-tab" onclick="showPage('batches')" id="tab-batches">📋 Batch Cards</button>
+    <button class="nav-tab" onclick="showPage('ingredients')" id="tab-ingredients">⚗️ Ingredients</button>
+    <button class="nav-tab" onclick="showPage('qc')" id="tab-qc">✅ QC Records</button>
+  </div>
+  <button class="btn bpur" onclick="installApp()" style="flex-shrink:0;padding:6px 12px;font-size:12px" title="Install App">📲 Install</button>
+</div>
+
+<!-- SIDEBAR OVERLAY -->
+<div id="sidebar-overlay" style="display:none;position:fixed;inset:0;z-index:199;background:rgba(0,0,0,.45)" onclick="closeSidebar()"></div>
+
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+  <canvas id="banner-icon" width="44" height="44" style="border-radius:10px;flex-shrink:0;border:1px solid var(--accent)"></canvas>
+  <div class="install-text">
+    <div class="install-title">📲 Add CoatCraft PRO to your device</div>
+    <div class="install-sub" id="install-sub">Install to use offline &amp; access from home screen</div>
+  </div>
+  <button class="btn bp" onclick="installApp()" style="flex-shrink:0">Install</button>
+  <button class="btn bs" onclick="dismissInstall()" style="flex-shrink:0;padding:9px 12px">✕</button>
+</div>
+
+<!-- INSTALL GUIDE MODAL -->
+<div class="mo" id="mo-install-guide">
+  <div class="modal modal-lg">
+    <div class="modal-title">📲 How to Install CoatCraft PRO</div>
+    <div class="modal-body" style="margin-bottom:12px">Follow these steps to install the app on your device:</div>
+    <div id="ig-steps" style="margin-bottom:20px;display:flex;flex-direction:column;gap:10px"></div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:20px">
+      <div style="font-size:11px;color:var(--text3);margin-bottom:6px;font-weight:600">APP URL — Share this link with your team:</div>
+      <div style="font-size:12px;color:var(--text);word-break:break-all;font-family:'DM Mono',monospace" id="ig-url"></div>
+      <button class="btn bs" style="margin-top:8px;font-size:12px;padding:6px 12px" onclick="copyInstallURL()">📋 Copy URL</button>
+    </div>
+    <div class="warn-banner" style="margin-bottom:16px">⚠️ The app must be opened from a <strong>web link (HTTPS)</strong> — not a local file — to enable installation. See the included DEPLOY guide.</div>
+    <div class="modal-actions">
+      <button class="btn bp" onclick="closeMo('mo-install-guide')">Got it</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP BODY -->
+<div class="app-body">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title" id="sb-label">Overview</span>
+      <button class="btn-new" onclick="newItemFromSidebar()">+ New</button>
+    </div>
+    <div class="search-box">
+      <input class="search-input" placeholder="Search…" id="sb-search" oninput="filterSidebar()">
+    </div>
+    <div class="sidebar-list" id="sb-list"></div>
+  </div>
+  <div class="main" id="main"></div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-c" id="toast-c"></div>
+
+<!-- CONFIRM MODAL -->
+<div class="mo" id="mo-confirm">
+  <div class="modal modal-sm">
+    <div class="modal-title" id="mc-title">Confirm Delete</div>
+    <div class="modal-body" id="mc-body">Are you sure?</div>
+    <div class="modal-actions">
+      <button class="btn bs" onclick="closeMo('mo-confirm')">Cancel</button>
+      <button class="btn bd" id="mc-ok">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT/IMPORT MODAL -->
+<div class="mo" id="mo-xfer">
+  <div class="modal modal-lg">
+    <div class="modal-title">📦 Export / Import Formulations</div>
+    <div class="modal-body" style="margin-bottom:16px">
+      Transfer your formulations between devices. Export creates a JSON backup file you can share via email, WhatsApp, or USB. Import reads that file on another device.
+    </div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:20px">
+      <div style="flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px">📤 Export</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Download all formulations as a .json file</div>
+        <select id="xfer-scope" style="margin-bottom:10px">
+          <option value="all">All Formulations</option>
+          <option value="single">Selected formulation only</option>
+        </select>
+        <button class="btn bp" style="width:100%" onclick="doExport()">⬇️ Download JSON</button>
+      </div>
+      <div style="flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:6px">📥 Import</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px">Load formulations from a JSON backup</div>
+        <input type="file" id="import-file" accept=".json" style="margin-bottom:10px;font-size:12px" onchange="previewImport(this)">
+        <div id="import-preview" style="font-size:12px;color:var(--text3);margin-bottom:10px"></div>
+        <button class="btn bg-btn" style="width:100%" onclick="doImport()" id="import-btn" disabled>⬆️ Import Formulas</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn bs" onclick="closeMo('mo-xfer')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- HIDDEN FILE INPUT for import -->
+<input type="file" id="fi-import" accept=".json" style="display:none" onchange="previewImport(this)">
+
+<script>
+'use strict';
+// ════════════════════════════════════
+// DATA LAYER
+// ════════════════════════════════════
+const DB={
+  get(k){try{return JSON.parse(localStorage.getItem('cc_'+k))||[]}catch{return[]}},
+  set(k,v){localStorage.setItem('cc_'+k,JSON.stringify(v))},
+  id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+};
+const gF=()=>DB.get('formulations');
+const gB=()=>DB.get('batches');
+const gI=()=>DB.get('ingredients');
+const gQ=()=>DB.get('qc');
+const sF=d=>DB.set('formulations',d);
+const sB=d=>DB.set('batches',d);
+const sI=d=>DB.set('ingredients',d);
+const sQ=d=>DB.set('qc',d);
+const CUR='AED';
+const fc=n=>`${CUR} ${parseFloat(n||0).toFixed(2)}`;
+
+function syncIngredients(){
+  const forms=gF();
+  const existing=gI();
+  const map={};
+  existing.forEach(i=>{map[i.name.trim().toLowerCase()]=i});
+  forms.forEach(f=>{
+    f.ingredients.forEach(ing=>{
+      const k=ing.name.trim().toLowerCase();
+      if(!k)return;
+      if(!map[k]){map[k]={id:DB.id(),name:ing.name.trim(),type:ing.role||'Other',supplier:'',casNo:'',costPerUnit:parseFloat(ing.cost||0),notes:''}}
+      else if(parseFloat(ing.cost||0)>0){map[k].costPerUnit=parseFloat(ing.cost||0)}
+    });
+  });
+  sI(Object.values(map));
+}
+
+function seedIfEmpty(){
+  if(gF().length)return;
+  const f1=DB.id(),f2=DB.id(),f3=DB.id();
+  sF([
+    {id:f1,name:'Premium Interior Latex — White',type:'Interior Paint',finish:'Flat',category:'Architectural',version:'2.3',created:'2025-01-10',notes:'Low VOC. High hiding power. Excellent flow and leveling.',ingredients:[
+      {id:DB.id(),name:'Water',role:'Solvent',amount:25,unit:'%',cost:0.04},
+      {id:DB.id(),name:'Titanium Dioxide',role:'Pigment',amount:22,unit:'%',cost:10.28},
+      {id:DB.id(),name:'Vinyl Acrylic Emulsion',role:'Binder',amount:35,unit:'%',cost:5.88},
+      {id:DB.id(),name:'Calcium Carbonate',role:'Extender',amount:12,unit:'%',cost:0.92},
+      {id:DB.id(),name:'Propylene Glycol',role:'Coalescing Aid',amount:3,unit:'%',cost:4.41},
+      {id:DB.id(),name:'Natrosol HBR',role:'Thickener',amount:1.5,unit:'%',cost:12.86},
+      {id:DB.id(),name:'Kathon LX',role:'Preservative',amount:0.1,unit:'%',cost:44.07},
+      {id:DB.id(),name:'AMP-95',role:'pH Adjuster',amount:0.4,unit:'%',cost:7.35},
+      {id:DB.id(),name:'Surfynol 104',role:'Surfactant',amount:0.5,unit:'%',cost:16.53},
+      {id:DB.id(),name:'BYK-028',role:'Defoamer',amount:0.5,unit:'%',cost:18.38},
+    ]},
+    {id:f2,name:'Industrial Epoxy Primer — Grey',type:'Primer',finish:'Semi-Gloss',category:'Industrial',version:'1.0',created:'2025-02-15',notes:'Two-component. Mix 4:1 by volume.',ingredients:[
+      {id:DB.id(),name:'Epoxy Resin DER-331',role:'Binder',amount:45,unit:'%',cost:11.76},
+      {id:DB.id(),name:'Grey Iron Oxide',role:'Pigment',amount:15,unit:'%',cost:6.61},
+      {id:DB.id(),name:'Xylene',role:'Solvent',amount:20,unit:'%',cost:3.31},
+      {id:DB.id(),name:'Talc',role:'Extender',amount:10,unit:'%',cost:1.10},
+      {id:DB.id(),name:'Versamid 125',role:'Curing Agent',amount:10,unit:'%',cost:16.53},
+    ]},
+    {id:f3,name:'Exterior Gloss — Navy Blue',type:'Exterior Paint',finish:'Gloss',category:'Architectural',version:'1.5',created:'2025-03-01',notes:'Weather-resistant. UV stabilized.',ingredients:[
+      {id:DB.id(),name:'Alkyd Resin',role:'Binder',amount:40,unit:'%',cost:7.71},
+      {id:DB.id(),name:'Prussian Blue',role:'Pigment',amount:8,unit:'%',cost:20.20},
+      {id:DB.id(),name:'Titanium Dioxide',role:'Pigment',amount:14,unit:'%',cost:10.28},
+      {id:DB.id(),name:'Mineral Spirits',role:'Solvent',amount:30,unit:'%',cost:2.57},
+      {id:DB.id(),name:'Cobalt Drier',role:'Drier',amount:0.5,unit:'%',cost:29.39},
+      {id:DB.id(),name:'Anti-skin Agent BYK-020',role:'Additive',amount:0.5,unit:'%',cost:22.04},
+      {id:DB.id(),name:'Calcium Carbonate',role:'Extender',amount:7,unit:'%',cost:0.92},
+    ]},
+  ]);
+  syncIngredients();
+  sB([
+    {id:DB.id(),batchNo:'B-2025-001',formulationId:f1,formulationName:'Premium Interior Latex — White',batchSize:500,unit:'L',date:'2025-01-20',operator:'John M.',status:'Released',mixingTime:45,temperature:22,viscosity:95,pH:8.5,density:1.38,notes:'Normal production. All spec met.'},
+    {id:DB.id(),batchNo:'B-2025-002',formulationId:f2,formulationName:'Industrial Epoxy Primer — Grey',batchSize:200,unit:'L',date:'2025-02-18',operator:'Sara K.',status:'Released',mixingTime:60,temperature:20,viscosity:120,pH:null,density:1.52,notes:'Part A only.'},
+    {id:DB.id(),batchNo:'B-2025-003',formulationId:f3,formulationName:'Exterior Gloss — Navy Blue',batchSize:300,unit:'L',date:'2025-03-10',operator:'John M.',status:'In Progress',mixingTime:null,temperature:23,viscosity:null,pH:null,density:null,notes:''},
+  ]);
+  sQ([
+    {id:DB.id(),batchNo:'B-2025-001',formulationName:'Premium Interior Latex — White',testDate:'2025-01-21',inspector:'QC Team',viscosity:95,viscositySpec:'85–110',pH:8.5,pHSpec:'8.0–9.0',density:1.38,densitySpec:'1.35–1.42',fineness:30,finenessSpec:'<40',hiding:98.2,hidingSpec:'>95',result:'Pass',notes:'All within spec.'},
+    {id:DB.id(),batchNo:'B-2025-002',formulationName:'Industrial Epoxy Primer — Grey',testDate:'2025-02-19',inspector:'QC Team',viscosity:120,viscositySpec:'110–140',pH:null,pHSpec:'N/A',density:1.52,densitySpec:'1.48–1.56',fineness:25,finenessSpec:'<30',hiding:96.5,hidingSpec:'>95',result:'Pass',notes:''},
+  ]);
+}
+
+// ════════════════════════════════════
+// PWA SETUP — Manifest + Service Worker + Icon
+// Requires HTTPS to fully install. See DEPLOY guide.
+// ════════════════════════════════════
+
+// Generate PNG icon using Canvas (real PNG, not SVG — required for iOS)
+function generateAppIcon(size){
+  const c=document.createElement('canvas');c.width=c.height=size;
+  const g=c.getContext('2d');
+  const r=size*0.18;
+  // Background rounded rect
+  g.fillStyle='#0e0f11';
+  g.beginPath();g.roundRect(0,0,size,size,r);g.fill();
+  // Gold gradient overlay
+  const grad=g.createLinearGradient(0,0,size,size);
+  grad.addColorStop(0,'rgba(232,160,32,0.12)');
+  grad.addColorStop(1,'rgba(14,15,17,0)');
+  g.fillStyle=grad;g.beginPath();g.roundRect(0,0,size,size,r);g.fill();
+  // Document rectangle
+  const m=size*0.16;const dw=size-m*2;const dh=size*0.72;
+  const dy=size*0.14;
+  g.strokeStyle='#e8a020';g.lineWidth=size*0.04;g.lineJoin='round';
+  g.strokeRect(m+g.lineWidth/2,dy+g.lineWidth/2,dw-g.lineWidth,dh-g.lineWidth);
+  // Lines inside doc (formula rows)
+  g.strokeStyle='#e8a020';g.lineWidth=size*0.035;g.lineCap='round';
+  const lx1=m+size*0.12;const lx2=size-m-size*0.12;
+  const lineY=[0.30,0.42,0.54,0.66].map(f=>size*f);
+  lineY.forEach((y,i)=>{
+    g.globalAlpha=1-i*0.2;
+    g.beginPath();g.moveTo(lx1,y);
+    g.lineTo(i===3?lx1+(lx2-lx1)*0.55:lx2,y);
+    g.stroke();
+  });
+  g.globalAlpha=1;
+  // Gold checkmark circle in bottom-right
+  const cx=size*0.72;const cy=size*0.76;const cr=size*0.13;
+  g.fillStyle='#e8a020';g.beginPath();g.arc(cx,cy,cr,0,Math.PI*2);g.fill();
+  g.strokeStyle='#0e0f11';g.lineWidth=size*0.035;g.lineCap='round';g.lineJoin='round';
+  g.beginPath();
+  g.moveTo(cx-cr*0.45,cy);g.lineTo(cx-cr*0.1,cy+cr*0.45);g.lineTo(cx+cr*0.5,cy-cr*0.4);
+  g.stroke();
+  return c.toDataURL('image/png');
+}
+
+// Set Apple Touch Icon (real PNG required by iOS)
+function setupIcons(){
+  try{
+    const png=generateAppIcon(512);
+    document.getElementById('apple-icon').href=png;
+    // Also inject as manifest icon
+    return png;
+  }catch(e){return null}
+}
+
+// Register inline Service Worker (required for PWA install on all platforms)
+function registerSW(){
+  if(!('serviceWorker' in navigator))return;
+  const swCode=`
+const CACHE='coatcraft-v2';
+const ASSETS=[self.location.origin+self.location.pathname];
+self.addEventListener('install',e=>{
+  e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).catch(()=>{}));
+  self.skipWaiting();
+});
+self.addEventListener('activate',e=>{
+  e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
+  self.clients.claim();
+});
+self.addEventListener('fetch',e=>{
+  if(e.request.method!=='GET')return;
+  e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{
+    if(resp.ok){const cl=resp.clone();caches.open(CACHE).then(c=>c.put(e.request,cl));}
+    return resp;
+  }).catch(()=>caches.match(e.request))));
+});
+  `;
+  const blob=new Blob([swCode],{type:'application/javascript'});
+  const swURL=URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swURL,{scope:'./'})
+    .then(()=>console.log('CoatCraft SW registered'))
+    .catch(e=>console.warn('SW registration failed:',e));
+}
+
+// Inject Web App Manifest dynamically
+function setupManifest(iconPng){
+  const icons=iconPng?[
+    {src:iconPng,sizes:'512x512',type:'image/png',purpose:'any maskable'},
+    {src:iconPng,sizes:'192x192',type:'image/png',purpose:'any maskable'}
+  ]:[{src:'./favicon.ico',sizes:'64x64',type:'image/x-icon'}];
+  const manifest={
+    name:'CoatCraft PRO',short_name:'CoatCraft',
+    description:'Paint & Coatings Formulation Management System',
+    start_url:window.location.href,
+    scope:window.location.href,
+    display:'standalone',orientation:'portrait-primary',
+    theme_color:'#0e0f11',background_color:'#0e0f11',
+    categories:['productivity','business'],icons
+  };
+  const blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  document.getElementById('pwa-manifest').href=URL.createObjectURL(blob);
+}
+
+// PWA Install prompt
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  showInstallBanner('android');
+});
+window.addEventListener('appinstalled',()=>{
+  hideInstallBanner();
+  toast('✅ CoatCraft PRO installed! Find it on your home screen.','success');
+});
+
+function showInstallBanner(type){
+  const banner=document.getElementById('install-banner');
+  const sub=document.getElementById('install-sub');
+  if(type==='ios'){
+    sub.textContent='Open in Safari → tap Share ⎋ → "Add to Home Screen"';
+  } else if(type==='android'){
+    sub.textContent='Tap Install to add to your home screen & use offline';
+  } else {
+    sub.textContent='Click Install to add to your desktop & use offline';
+  }
+  // Draw the mini icon in canvas
+  try{
+    const bc=document.getElementById('banner-icon');
+    const bCtx=bc.getContext('2d');
+    const img=new Image();
+    img.onload=()=>bCtx.drawImage(img,0,0,44,44);
+    img.src=document.getElementById('apple-icon').href;
+  }catch(e){}
+  banner.classList.add('show');
+}
+function hideInstallBanner(){document.getElementById('install-banner').classList.remove('show')}
+function dismissInstall(){hideInstallBanner()}
+
+function installApp(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(r=>{
+      deferredPrompt=null;hideInstallBanner();
+      if(r.outcome==='accepted')toast('Installing CoatCraft PRO…','success');
+    });
+  } else {
+    // Show step-by-step modal
+    openInstallGuide();
+  }
+}
+
+function openInstallGuide(){
+  const isIOS=/iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isMac=/mac/.test(navigator.userAgent.toLowerCase())&&!isIOS;
+  const isWin=/windows/.test(navigator.userAgent.toLowerCase());
+  const isSafari=/^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  let steps='';
+  if(isIOS||isSafari){
+    steps=`<div class="ig-step">1️⃣ Open this page in <strong>Safari</strong> (not Chrome)</div>
+    <div class="ig-step">2️⃣ Tap the <strong>Share button</strong> ⎋ at the bottom of Safari</div>
+    <div class="ig-step">3️⃣ Scroll down and tap <strong>"Add to Home Screen"</strong></div>
+    <div class="ig-step">4️⃣ Tap <strong>"Add"</strong> in the top-right corner</div>
+    <div class="ig-step">✅ CoatCraft PRO icon will appear on your home screen!</div>`;
+  } else if(isWin){
+    steps=`<div class="ig-step">1️⃣ Open this page in <strong>Chrome or Edge</strong></div>
+    <div class="ig-step">2️⃣ Click the <strong>⋮ menu</strong> (top-right)</div>
+    <div class="ig-step">3️⃣ Click <strong>"Install CoatCraft PRO"</strong> or <strong>"Add to Desktop"</strong></div>
+    <div class="ig-step">4️⃣ Click <strong>"Install"</strong> in the popup</div>
+    <div class="ig-step">✅ Shortcut appears on your desktop &amp; taskbar!</div>`;
+  } else {
+    steps=`<div class="ig-step">1️⃣ Open this page in <strong>Chrome or Edge</strong></div>
+    <div class="ig-step">2️⃣ Click the <strong>install icon ⊕</strong> in the address bar, or</div>
+    <div class="ig-step">3️⃣ Open <strong>⋮ menu → Install CoatCraft PRO</strong></div>
+    <div class="ig-step">4️⃣ Confirm by clicking <strong>"Install"</strong></div>
+    <div class="ig-step">✅ The app will open like a native app!</div>`;
+  }
+  document.getElementById('ig-steps').innerHTML=steps;
+  const url=window.location.href;
+  document.getElementById('ig-url').textContent=url;
+  openMo('mo-install-guide');
+}
+
+function copyInstallURL(){
+  navigator.clipboard.writeText(window.location.href).then(()=>toast('URL copied!','success'));
+}
+
+function checkInstallPrompt(){
+  const isIOS=/iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  const isStandalone=('standalone' in window.navigator)&&window.navigator.standalone||window.matchMedia('(display-mode: standalone)').matches;
+  if(isStandalone)return; // Already installed
+  if(isIOS){
+    setTimeout(()=>showInstallBanner('ios'),2500);
+  }
+  // Desktop/Android: handled by beforeinstallprompt event
+}
+
+// PWA init — called on page load
+function initPWA(){
+  const iconPng=setupIcons();
+  setupManifest(iconPng);
+  // Only register SW when served over HTTP/S (not file://)
+  if(window.location.protocol!=='file:'){
+    registerSW();
+  }
+  checkInstallPrompt();
+}
+
+// ════════════════════════════════════
+// EXPORT / IMPORT
+// ════════════════════════════════════
+let importData=null;
+function openXfer(){
+  const sel=document.getElementById('xfer-scope');
+  if(cItem&&page==='formulations'){sel.innerHTML='<option value="all">All Formulations</option><option value="single" selected>This formulation only</option>'}
+  else{sel.innerHTML='<option value="all">All Formulations</option><option value="single">Selected formulation</option>'}
+  document.getElementById('import-preview').textContent='';
+  document.getElementById('import-btn').disabled=true;
+  importData=null;
+  openMo('mo-xfer');
+}
+function doExport(){
+  const scope=document.getElementById('xfer-scope').value;
+  let data;
+  if(scope==='single'&&cItem&&page==='formulations'){
+    const f=gF().find(x=>x.id===cItem);
+    data={version:'1.0',exported:new Date().toISOString(),type:'single',formulations:f?[f]:gF()};
+  } else {
+    data={version:'1.0',exported:new Date().toISOString(),type:'all',formulations:gF()};
+  }
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`CoatCraft_Formulations_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();URL.revokeObjectURL(url);
+  toast(`Exported ${data.formulations.length} formulation(s)!`,'success');
+}
+function previewImport(input){
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      importData=JSON.parse(e.target.result);
+      if(!importData.formulations||!Array.isArray(importData.formulations))throw new Error('Invalid format');
+      document.getElementById('import-preview').innerHTML=`<span style="color:var(--green)">✓ Found ${importData.formulations.length} formulation(s): ${importData.formulations.map(f=>f.name).join(', ')}</span>`;
+      document.getElementById('import-btn').disabled=false;
+    }catch(err){
+      document.getElementById('import-preview').innerHTML=`<span style="color:var(--red)">✗ Invalid file format</span>`;
+      document.getElementById('import-btn').disabled=true;
+      importData=null;
+    }
+  };
+  reader.readAsText(file);
+}
+function doImport(){
+  if(!importData)return;
+  const existing=gF();
+  let added=0,updated=0;
+  importData.formulations.forEach(f=>{
+    const idx=existing.findIndex(x=>x.id===f.id);
+    if(idx>=0){existing[idx]=f;updated++}
+    else{existing.push(f);added++}
+  });
+  sF(existing);
+  syncIngredients();
+  renderSidebar();renderMain();
+  closeMo('mo-xfer');
+  toast(`Import complete: ${added} added, ${updated} updated.`,'success');
+}
+
+// ════════════════════════════════════
+// PDF EXPORT — POPUP WINDOW APPROACH
+// Opens a clean white document in a new window for perfect printing
+// ════════════════════════════════════
+const PDF_CSS=`
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{size:A4;margin:14mm 15mm 18mm 15mm}
+  body{font-family:'Segoe UI',Arial,Helvetica,sans-serif;font-size:9.5pt;color:#1a1a1a;background:#fff;line-height:1.45}
+
+  /* ── PAGE HEADER ── */
+  .ph{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:10pt;margin-bottom:14pt;border-bottom:2.5pt solid #e8a020}
+  .ph-logo{font-size:20pt;font-weight:900;color:#e8a020;letter-spacing:2pt;font-family:Georgia,serif;line-height:1}
+  .ph-logo span{color:#999;font-weight:400}
+  .ph-tagline{font-size:7.5pt;color:#888;margin-top:2pt;letter-spacing:.4pt}
+  .ph-right{text-align:right;font-size:7.5pt;color:#777;line-height:1.6}
+  .ph-conf{display:inline-block;background:#e8a020;color:#fff;padding:2pt 8pt;border-radius:3pt;font-weight:700;font-size:7pt;margin-top:4pt;letter-spacing:.5pt}
+
+  /* ── DOCUMENT TITLE BAND ── */
+  .doc-band{background:#f5f5f5;border-left:4pt solid #e8a020;border-radius:0 4pt 4pt 0;padding:9pt 14pt 9pt 12pt;margin-bottom:14pt;page-break-inside:avoid}
+  .doc-type{font-size:7pt;font-weight:700;color:#aaa;letter-spacing:2pt;text-transform:uppercase;margin-bottom:3pt}
+  .doc-title{font-size:15pt;font-weight:700;color:#111;line-height:1.2}
+  .doc-sub{font-size:8.5pt;color:#666;margin-top:3pt}
+
+  /* ── INFO GRID ── */
+  .ig{display:grid;grid-template-columns:repeat(4,1fr);gap:6pt;margin-bottom:12pt}
+  .ig-2{grid-template-columns:repeat(2,1fr)}
+  .ig-3{grid-template-columns:repeat(3,1fr)}
+  .ic{background:#f9f9f9;border:1pt solid #e8e8e8;border-radius:4pt;padding:7pt 10pt}
+  .ic-lbl{font-size:6.5pt;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.8pt;margin-bottom:2pt}
+  .ic-val{font-size:11.5pt;font-weight:600;color:#111;line-height:1.2}
+  .ic-val.accent{color:#b8850a}
+
+  /* ── COST HIGHLIGHT ── */
+  .cost-row{background:#fffbf0;border:1pt solid #f0d888;border-radius:4pt;padding:9pt 14pt;margin-bottom:12pt;display:flex;align-items:center;justify-content:space-between;page-break-inside:avoid}
+  .cost-lbl{font-size:8pt;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.8pt}
+  .cost-val{font-size:15pt;font-weight:700;color:#b8850a;font-family:monospace}
+
+  /* ── SECTION TITLES ── */
+  .sec{font-size:7pt;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:2pt;margin:14pt 0 6pt;padding-bottom:4pt;border-bottom:1pt solid #e8e8e8;page-break-after:avoid}
+
+  /* ── TABLES ── */
+  .tbl-wrap{border:1pt solid #ddd;border-radius:4pt;overflow:hidden;margin-bottom:12pt;page-break-inside:avoid}
+  table{width:100%;border-collapse:collapse}
+  thead tr{background:#f2f2f2}
+  th{font-size:7pt;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.8pt;padding:7pt 10pt;text-align:left;border-bottom:1.5pt solid #ddd;border-right:1pt solid #e5e5e5}
+  th:last-child{border-right:none}
+  td{font-size:8.5pt;color:#333;padding:6pt 10pt;border-bottom:1pt solid #ebebeb;border-right:1pt solid #f0f0f0;vertical-align:middle}
+  td:last-child{border-right:none}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:nth-child(even){background:#fafafa}
+  td strong{color:#111;font-weight:600}
+  td.mono{font-family:monospace;font-size:8pt}
+  td.mono-bold{font-family:monospace;font-size:8pt;font-weight:700}
+  td.accent{color:#b8850a;font-family:monospace;font-weight:700}
+  td.muted{color:#999}
+  td.center{text-align:center}
+
+  /* ── PROGRESS BAR IN TABLE ── */
+  .pb-wrap{display:flex;align-items:center;gap:5pt}
+  .pb-pct{font-size:7.5pt;min-width:30pt;text-align:right;color:#555;font-family:monospace}
+  .pb-bg{flex:1;background:#ebebeb;border-radius:3pt;height:5pt}
+  .pb-fill{height:100%;border-radius:3pt;background:#e8a020}
+
+  /* ── STATUS WORKFLOW STRIP ── */
+  .steps{display:flex;border:1pt solid #ddd;border-radius:4pt;overflow:hidden;margin-bottom:12pt;page-break-inside:avoid}
+  .step{flex:1;padding:7pt 3pt;text-align:center;font-size:7pt;font-weight:600;color:#aaa;background:#f7f7f7;border-right:1pt solid #ddd}
+  .step:last-child{border-right:none}
+  .step.done{background:#eaf7f1;color:#1a7a4a}
+  .step.active{background:#fff8e8;color:#b8850a;font-weight:700}
+
+  /* ── BADGES & TAGS ── */
+  .badge{display:inline-block;padding:2pt 6pt;border-radius:10pt;font-size:7pt;font-weight:700;letter-spacing:.3pt}
+  .b-green{background:#eaf7f1;color:#1a7a4a;border:1pt solid #c3e8d6}
+  .b-red{background:#fdecea;color:#c0392b;border:1pt solid #f5b7b1}
+  .b-amber{background:#fff8e8;color:#b8850a;border:1pt solid #f0d888}
+  .b-blue{background:#eaf2ff;color:#1a6abf;border:1pt solid #a8c9f0}
+  .b-grey{background:#f2f2f2;color:#666;border:1pt solid #ddd}
+  .tag{display:inline-block;background:#f0f0f0;border:1pt solid #ddd;color:#555;font-size:7pt;padding:1.5pt 6pt;border-radius:10pt;font-weight:600}
+
+  /* ── RESULT STAMP ── */
+  .stamp{display:inline-block;padding:7pt 18pt;border-radius:5pt;font-size:13pt;font-weight:700;letter-spacing:1pt;margin-bottom:12pt;border-width:2pt;border-style:solid}
+  .stamp-pass{background:#eaf7f1;color:#1a7a4a;border-color:#2ecc71}
+  .stamp-fail{background:#fdecea;color:#c0392b;border-color:#e74c3c}
+
+  /* ── QC TEST ROWS ── */
+  .qc-pass-val{color:#1a7a4a;font-weight:700;font-family:monospace}
+  .qc-fail-val{color:#c0392b;font-weight:700;font-family:monospace}
+
+  /* ── NOTES ── */
+  .notes-box{background:#fffde8;border:1pt solid #f0d888;border-radius:4pt;padding:9pt 12pt;margin:10pt 0;page-break-inside:avoid}
+  .notes-lbl{font-size:7pt;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1.5pt;margin-bottom:4pt}
+  .notes-txt{font-size:9pt;color:#444;line-height:1.6}
+
+  /* ── SIGN-OFF BOXES ── */
+  .signoff{display:grid;gap:10pt;margin-top:14pt;page-break-inside:avoid}
+  .signoff-2{grid-template-columns:1fr 1fr}
+  .signoff-3{grid-template-columns:1fr 1fr 1fr}
+  .sign-box{border:1pt solid #ddd;border-radius:4pt;padding:10pt 12pt}
+  .sign-lbl{font-size:6.5pt;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:1pt;margin-bottom:16pt}
+  .sign-line{border-bottom:1pt solid #bbb;margin-bottom:4pt}
+  .sign-sub{font-size:6.5pt;color:#bbb}
+
+  /* ── PAGE FOOTER ── */
+  .pf{margin-top:18pt;padding-top:7pt;border-top:1pt solid #e8e8e8;display:flex;justify-content:space-between;font-size:7pt;color:#bbb}
+
+  /* ── PRINT BUTTON (hidden on print) ── */
+  .print-btn{display:block;margin:0 0 16pt;background:#e8a020;color:#fff;border:none;padding:9pt 20pt;border-radius:6pt;font-size:11pt;font-weight:700;cursor:pointer;letter-spacing:.5pt}
+  @media print{.print-btn{display:none!important}}
+`;
+
+function pdfOpen(title,bodyHtml){
+  const now=new Date();
+  const dt=now.toLocaleDateString('en-AE',{day:'2-digit',month:'long',year:'numeric'});
+  const tm=now.toLocaleTimeString('en-AE',{hour:'2-digit',minute:'2-digit'});
+  const header=`<div class="ph">
+    <div>
+      <div class="ph-logo">CoatCraft <span>PRO</span></div>
+      <div class="ph-tagline">Paint &amp; Coatings Management System</div>
+    </div>
+    <div class="ph-right">
+      <div>Printed: ${dt} at ${tm}</div>
+      <div>CoatCraft PRO — Internal Document</div>
+      <div class="ph-conf">CONFIDENTIAL</div>
+    </div>
+  </div>`;
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>${PDF_CSS}</style></head><body>
+    <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    ${header}${bodyHtml}
+  </body></html>`;
+  const w=window.open('','_blank','width=900,height=750,scrollbars=yes');
+  if(!w){toast('Allow popups to open the PDF viewer.','error');return;}
+  w.document.write(html);w.document.close();
+}
+
+function exportFormulationPDF(id){
+  const f=gF().find(x=>x.id===id);if(!f)return;
+  const tot=f.ingredients.reduce((s,i)=>s+parseFloat(i.amount||0),0);
+  const cpk=f.ingredients.reduce((s,i)=>s+(parseFloat(i.amount||0)/100)*parseFloat(i.cost||0),0);
+  const batches=gB().filter(b=>b.formulationId===id);
+
+  const ingRows=f.ingredients.map((i,idx)=>{
+    const pct=tot>0?(parseFloat(i.amount||0)/tot*100):0;
+    const barW=Math.min(Math.round(pct),100);
+    const rowCost=fc((parseFloat(i.amount||0)/100)*parseFloat(i.cost||0));
+    return`<tr>
+      <td class="muted center" style="width:24pt">${idx+1}</td>
+      <td><strong>${i.name}</strong></td>
+      <td><span class="tag">${i.role}</span></td>
+      <td class="mono-bold">${i.amount} ${i.unit}</td>
+      <td class="mono">${fc(i.cost)}</td>
+      <td class="accent">${rowCost}</td>
+      <td style="min-width:80pt">
+        <div class="pb-wrap">
+          <div class="pb-bg"><div class="pb-fill" style="width:${barW}%"></div></div>
+          <div class="pb-pct">${pct.toFixed(1)}%</div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const batchRows=batches.map(b=>`<tr>
+    <td><strong>${b.batchNo}</strong></td><td>${b.date}</td>
+    <td class="mono">${b.batchSize} ${b.unit}</td>
+    <td>${b.operator}</td>
+    <td class="mono">${b.viscosity??'—'}</td>
+    <td class="mono">${b.pH??'—'}</td>
+    <td class="mono">${b.density??'—'}</td>
+    <td><span class="badge ${batchBadge(b.status)}">${b.status}</span></td>
+  </tr>`).join('');
+
+  const body=`
+  <div class="doc-band">
+    <div class="doc-type">Formulation Record</div>
+    <div class="doc-title">${f.name}</div>
+    <div class="doc-sub">${f.type} &nbsp;·&nbsp; ${f.finish} Finish &nbsp;·&nbsp; ${f.category} &nbsp;·&nbsp; Version ${f.version} &nbsp;·&nbsp; Created ${f.created}</div>
+  </div>
+
+  <div class="ig">
+    <div class="ic"><div class="ic-lbl">Paint Type</div><div class="ic-val">${f.type}</div></div>
+    <div class="ic"><div class="ic-lbl">Finish</div><div class="ic-val">${f.finish}</div></div>
+    <div class="ic"><div class="ic-lbl">Category</div><div class="ic-val">${f.category}</div></div>
+    <div class="ic"><div class="ic-lbl">Version</div><div class="ic-val">v${f.version}</div></div>
+    <div class="ic"><div class="ic-lbl">Date Created</div><div class="ic-val">${f.created}</div></div>
+    <div class="ic"><div class="ic-lbl">No. of Ingredients</div><div class="ic-val">${f.ingredients.length}</div></div>
+    <div class="ic"><div class="ic-lbl">Total Formula %</div><div class="ic-val">${tot.toFixed(1)}%</div></div>
+    <div class="ic"><div class="ic-lbl">Est. Cost / kg</div><div class="ic-val accent">${fc(cpk)}</div></div>
+  </div>
+
+  <div class="cost-row">
+    <div class="cost-lbl">Estimated Formula Cost per Kilogram</div>
+    <div class="cost-val">${fc(cpk)}</div>
+  </div>
+
+  ${f.notes?`<div class="notes-box"><div class="notes-lbl">Formula Notes &amp; Mixing Instructions</div><div class="notes-txt">${f.notes}</div></div>`:''}
+
+  <div class="sec">Formula Composition — ${f.ingredients.length} Ingredients (Total: ${tot.toFixed(1)}%)</div>
+  <div class="tbl-wrap"><table>
+    <thead><tr>
+      <th style="width:22pt">#</th>
+      <th>Ingredient Name</th>
+      <th>Functional Role</th>
+      <th>Amount</th>
+      <th>Cost / Unit (AED)</th>
+      <th>Formula Cost (AED)</th>
+      <th style="min-width:100pt">Composition</th>
+    </tr></thead>
+    <tbody>${ingRows}</tbody>
+  </table></div>
+
+  ${batches.length?`
+  <div class="sec">Production Batches Using This Formula (${batches.length})</div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Batch No.</th><th>Date</th><th>Batch Size</th><th>Operator</th><th>Viscosity</th><th>pH</th><th>Density</th><th>Status</th></tr></thead>
+    <tbody>${batchRows}</tbody>
+  </table></div>`:''}
+
+  <div class="signoff signoff-3">
+    <div class="sign-box"><div class="sign-lbl">Formulated By</div><div class="sign-line">&nbsp;</div><div class="sign-sub">Name &amp; Signature / Date</div></div>
+    <div class="sign-box"><div class="sign-lbl">Reviewed By</div><div class="sign-line">&nbsp;</div><div class="sign-sub">Name &amp; Signature / Date</div></div>
+    <div class="sign-box"><div class="sign-lbl">Approved By</div><div class="sign-line">&nbsp;</div><div class="sign-sub">Name &amp; Signature / Date</div></div>
+  </div>
+
+  <div class="pf">
+    <span>CoatCraft PRO — Paint &amp; Coatings Management System</span>
+    <span>Formulation: ${f.name} &nbsp;|&nbsp; v${f.version}</span>
+  </div>`;
+
+  pdfOpen(`Formulation — ${f.name}`,body);
+}
+
+function batchBadge(s){if(s==='Released')return'b-green';if(s==='In Progress')return'b-amber';if(s==='On Hold'||s==='Cancelled')return'b-red';return'b-blue'}
+
+function exportBatchPDF(id){
+  const b=gB().find(x=>x.id===id);if(!b)return;
+  const f=gF().find(x=>x.id===b.formulationId);
+  const STEPS=['Pending','Weighing','Mixing','Quality Check','Filling','Released'];
+  const si=STEPS.indexOf(b.status);
+  const qcRecs=gQ().filter(q=>q.batchNo===b.batchNo);
+
+  const stepsHtml=STEPS.map((s,i)=>`<div class="step ${i<si?'done':i===si?'active':''}">${i<si?'✓ ':i===si?'▶ ':''}${s}</div>`).join('');
+
+  const weighSheet=f?f.ingredients.map((i,idx)=>{
+    const qty=(parseFloat(i.amount||0)/100*parseFloat(b.batchSize||0)).toFixed(3);
+    return`<tr>
+      <td class="muted center" style="width:22pt">${idx+1}</td>
+      <td><strong>${i.name}</strong></td>
+      <td><span class="tag">${i.role}</span></td>
+      <td class="mono">${i.amount} ${i.unit}</td>
+      <td class="accent">${qty} ${b.unit}</td>
+      <td style="min-width:55pt;border-bottom:1pt dotted #ccc">&nbsp;</td>
+      <td style="min-width:35pt;border-bottom:1pt dotted #ccc">&nbsp;</td>
+    </tr>`;
+  }).join(''):'';
+
+  const qcSection=qcRecs.length?`
+  <div class="sec">QC Test Records (${qcRecs.length})</div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Test Date</th><th>Inspector</th><th>Viscosity</th><th>pH</th><th>Density</th><th>Fineness</th><th>Hiding %</th><th>Result</th></tr></thead>
+    <tbody>${qcRecs.map(q=>`<tr>
+      <td>${q.testDate}</td><td>${q.inspector}</td>
+      <td class="mono">${q.viscosity??'—'}</td><td class="mono">${q.pH??'—'}</td>
+      <td class="mono">${q.density??'—'}</td><td class="mono">${q.fineness??'—'}</td>
+      <td class="mono">${q.hiding??'—'}</td>
+      <td><span class="badge ${q.result==='Pass'?'b-green':'b-red'}">${q.result}</span></td>
+    </tr>`).join('')}</tbody>
+  </table></div>
+  `:`
+  <div class="sec">QC Inspection Sheet — To Be Completed</div>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Parameter</th><th>Specification</th><th>Measured Value</th><th>Pass / Fail</th><th>Initials</th></tr></thead>
+    <tbody>
+      ${['Viscosity (KU)','pH','Density (g/mL)','Fineness of Grind (µm)','Hiding Power (%)'].map(p=>`<tr>
+        <td><strong>${p}</strong></td>
+        <td style="min-width:60pt;border-bottom:1pt dotted #ccc">&nbsp;</td>
+        <td style="min-width:60pt;border-bottom:1pt dotted #ccc">&nbsp;</td>
+        <td>☐ Pass &nbsp;&nbsp; ☐ Fail</td>
+        <td style="min-width:40pt;border-bottom:1pt dotted #ccc">&nbsp;</td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>`;
+
+  const body=`
+  <div class="doc-band">
+    <div class="doc-type">Batch Production Card</div>
+    <div class="doc-title">${b.batchNo}</div>
+    <div class="doc-sub">${b.formulationName} &nbsp;·&nbsp; ${b.batchSize} ${b.unit} &nbsp;·&nbsp; ${b.date} &nbsp;·&nbsp; Operator: ${b.operator}</div>
+  </div>
+
+  <div class="steps">${stepsHtml}</div>
+
+  <div class="ig">
+    <div class="ic"><div class="ic-lbl">Batch Number</div><div class="ic-val">${b.batchNo}</div></div>
+    <div class="ic"><div class="ic-lbl">Production Date</div><div class="ic-val">${b.date}</div></div>
+    <div class="ic"><div class="ic-lbl">Operator</div><div class="ic-val">${b.operator}</div></div>
+    <div class="ic"><div class="ic-lbl">Batch Size</div><div class="ic-val">${b.batchSize} ${b.unit}</div></div>
+    <div class="ic"><div class="ic-lbl">Mixing Time</div><div class="ic-val">${b.mixingTime?b.mixingTime+' min':'—'}</div></div>
+    <div class="ic"><div class="ic-lbl">Temperature</div><div class="ic-val">${b.temperature?b.temperature+'°C':'—'}</div></div>
+    <div class="ic"><div class="ic-lbl">Viscosity (KU)</div><div class="ic-val">${b.viscosity??'—'}</div></div>
+    <div class="ic"><div class="ic-lbl">pH</div><div class="ic-val">${b.pH??'—'}</div></div>
+    <div class="ic"><div class="ic-lbl">Density (g/mL)</div><div class="ic-val">${b.density??'—'}</div></div>
+    <div class="ic"><div class="ic-lbl">Status</div><div class="ic-val"><span class="badge ${batchBadge(b.status)}">${b.status}</span></div></div>
+  </div>
+
+  ${b.notes?`<div class="notes-box"><div class="notes-lbl">Production Notes</div><div class="notes-txt">${b.notes}</div></div>`:''}
+
+  ${f?`
+  <div class="sec">Raw Material Weighing Sheet — ${f.ingredients.length} Ingredients for ${b.batchSize} ${b.unit}</div>
+  <div class="tbl-wrap"><table>
+    <thead><tr>
+      <th style="width:22pt">#</th>
+      <th>Ingredient Name</th>
+      <th>Role</th>
+      <th>Formula %</th>
+      <th>Target Qty (${b.unit})</th>
+      <th>Actual Qty Weighed</th>
+      <th>Operator Initials</th>
+    </tr></thead>
+    <tbody>${weighSheet}</tbody>
+  </table></div>`:''}
+
+  ${qcSection}
+
+  <div class="signoff signoff-3">
+    <div class="sign-box"><div class="sign-lbl">Prepared By</div><div class="sign-line">&nbsp;</div><div class="sign-sub">Name &amp; Signature / Date</div></div>
+    <div class="sign-box"><div class="sign-lbl">QC Approved By</div><div class="sign-line">&nbsp;</div><div class="sign-sub">Name &amp; Signature / Date</div></div>
+    <div class="sign-box"><div class="sign-lbl">Released By</div><div class="sign-line">&nbsp;</div><div class="sign-sub">Name &amp; Signature / Date</div></div>
+  </div>
+
+  <div class="pf">
+    <span>CoatCraft PRO — Batch Production Card</span>
+    <span>Batch: ${b.batchNo} &nbsp;|&nbsp; ${b.formulationName}</span>
+  </div>`;
+
+  pdfOpen(`Batch Card — ${b.batchNo}`,body);
+}
+
+function exportQCPDF(id){
+  const q=gQ().find(x=>x.id===id);if(!q)return;
+  function pass(val,spec){
+    if(!val||!spec||spec==='N/A')return null;
+    const m=spec.match(/([\d.]+)[–\-]([\d.]+)/);if(m)return parseFloat(val)>=parseFloat(m[1])&&parseFloat(val)<=parseFloat(m[2]);
+    const gt=spec.match(/>(\d+)/);if(gt)return parseFloat(val)>parseFloat(gt[1]);
+    const lt=spec.match(/<(\d+)/);if(lt)return parseFloat(val)<parseFloat(lt[1]);
+    return null;
+  }
+  function qrow(lbl,val,spec){
+    const p=pass(val,spec);
+    const badge=p===null?`<span style="color:#aaa">N/A</span>`:p?`<span class="badge b-green">✓ PASS</span>`:`<span class="badge b-red">✗ FAIL</span>`;
+    const valClass=p===null?'mono':p?'qc-pass-val':'qc-fail-val';
+    return`<tr><td><strong>${lbl}</strong></td><td class="${valClass}">${val??'—'}</td><td class="mono">${spec||'—'}</td><td>${badge}</td></tr>`;
+  }
+  const allPass=q.result==='Pass';
+
+  const body=`
+  <div class="doc-band">
+    <div class="doc-type">Quality Control Certificate</div>
+    <div class="doc-title">QC Report — ${q.batchNo}</div>
+    <div class="doc-sub">${q.formulationName} &nbsp;·&nbsp; Test Date: ${q.testDate} &nbsp;·&nbsp; Inspector: ${q.inspector}</div>
+  </div>
+
+  <div style="margin-bottom:14pt">
+    <span class="stamp ${allPass?'stamp-pass':'stamp-fail'}">${allPass?'✓  QUALITY APPROVED':'✗  QUALITY REJECTED'}</span>
+  </div>
+
+  <div class="ig ig-2" style="margin-bottom:12pt">
+    <div class="ic"><div class="ic-lbl">Batch Number</div><div class="ic-val">${q.batchNo}</div></div>
+    <div class="ic"><div class="ic-lbl">Formulation</div><div class="ic-val">${q.formulationName}</div></div>
+    <div class="ic"><div class="ic-lbl">Test Date</div><div class="ic-val">${q.testDate}</div></div>
+    <div class="ic"><div class="ic-lbl">Inspector</div><div class="ic-val">${q.inspector}</div></div>
+  </div>
+
+  <div class="sec">Test Parameters vs Specifications</div>
+  <div class="tbl-wrap"><table>
+    <thead><tr>
+      <th>Parameter</th>
+      <th>Measured Value</th>
+      <th>Specification / Limit</th>
+      <th>Result</th>
+    </tr></thead>
+    <tbody>
+      ${qrow('Viscosity (KU)',q.viscosity,q.viscositySpec)}
+      ${qrow('pH',q.pH,q.pHSpec)}
+      ${qrow('Density (g/mL)',q.density,q.densitySpec)}
+      ${qrow('Fineness of Grind (µm)',q.fineness,q.finenessSpec)}
+      ${qrow('Hiding Power (%)',q.hiding,q.hidingSpec)}
+    </tbody>
+  </table></div>
+
+  ${q.notes?`<div class="notes-box"><div class="notes-lbl">Inspector Notes &amp; Observations</div><div class="notes-txt">${q.notes}</div></div>`:''}
+
+  <div class="signoff signoff-2" style="margin-top:18pt">
+    <div class="sign-box"><div class="sign-lbl">QC Inspector Signature</div><div class="sign-line" style="margin-top:22pt">&nbsp;</div><div class="sign-sub">Name / Signature / Date</div></div>
+    <div class="sign-box"><div class="sign-lbl">Authorized / Approved By</div><div class="sign-line" style="margin-top:22pt">&nbsp;</div><div class="sign-sub">Name / Signature / Date</div></div>
+  </div>
+
+  <div class="pf">
+    <span>CoatCraft PRO — Quality Control Certificate</span>
+    <span>Batch: ${q.batchNo} &nbsp;|&nbsp; Result: ${q.result}</span>
+  </div>`;
+
+  pdfOpen(`QC Report — ${q.batchNo}`,body);
+}
+
+function exportIngredientsPDF(){
+  const ing=gI();
+  const rows=ing.map((i,idx)=>`<tr>
+    <td class="muted center" style="width:22pt">${idx+1}</td>
+    <td><strong>${i.name}</strong></td>
+    <td><span class="tag">${i.type}</span></td>
+    <td>${i.supplier||'—'}</td>
+    <td class="mono" style="font-size:7.5pt">${i.casNo||'—'}</td>
+    <td class="accent">${fc(i.costPerUnit)}</td>
+    <td style="font-size:8pt;color:#666">${i.notes||'—'}</td>
+  </tr>`).join('');
+
+  const body=`
+  <div class="doc-band">
+    <div class="doc-type">Raw Materials Catalogue</div>
+    <div class="doc-title">Ingredients Register</div>
+    <div class="doc-sub">${ing.length} raw material${ing.length!==1?'s':''} on file &nbsp;·&nbsp; Exported ${new Date().toLocaleDateString('en-AE')}</div>
+  </div>
+
+  <div class="sec">Complete Ingredients List (${ing.length} items)</div>
+  <div class="tbl-wrap"><table>
+    <thead><tr>
+      <th style="width:22pt">#</th>
+      <th>Ingredient Name</th>
+      <th>Type / Role</th>
+      <th>Supplier</th>
+      <th>CAS Number</th>
+      <th>Cost / Unit (AED)</th>
+      <th>Notes</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>
+
+  <div class="pf">
+    <span>CoatCraft PRO — Raw Materials Catalogue</span>
+    <span>${ing.length} ingredients &nbsp;|&nbsp; Exported ${new Date().toLocaleDateString('en-AE')}</span>
+  </div>`;
+
+  pdfOpen('Ingredients Register',body);
+}
+
+// ════════════════════════════════════
+// ROUTING
+// ════════════════════════════════════
+let page='dashboard',cItem=null,vMode='list';
+function showPage(p,id,mode){
+  page=p;cItem=id||null;vMode=id?(mode||'detail'):'list';
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  const tab=document.getElementById('tab-'+p);if(tab)tab.classList.add('active');
+  renderSidebar();renderMain();closeSidebar();
+}
+function renderMain(){
+  const mc=document.getElementById('main');
+  if(page==='dashboard'){mc.innerHTML=renderDash();return}
+  if(page==='formulations'){
+    if(vMode==='form'){mc.innerHTML=renderFForm(cItem);initPI(cItem);return}
+    if(vMode==='detail'&&cItem){mc.innerHTML=renderFDetail(cItem);return}
+    mc.innerHTML=renderFList();return;
+  }
+  if(page==='batches'){
+    if(vMode==='form'){mc.innerHTML=renderBForm(cItem);return}
+    if(vMode==='detail'&&cItem){mc.innerHTML=renderBDetail(cItem);return}
+    mc.innerHTML=renderBList();return;
+  }
+  if(page==='ingredients'){
+    if(vMode==='form'){mc.innerHTML=renderIForm(cItem);return}
+    mc.innerHTML=renderIList();return;
+  }
+  if(page==='qc'){
+    if(vMode==='form'){mc.innerHTML=renderQForm(cItem);return}
+    if(vMode==='detail'&&cItem){mc.innerHTML=renderQDetail(cItem);return}
+    mc.innerHTML=renderQList();return;
+  }
+}
+
+// ════════════════════════════════════
+// SIDEBAR
+// ════════════════════════════════════
+function renderSidebar(){
+  const labels={dashboard:'Overview',formulations:'Formulations',batches:'Batch Cards',ingredients:'Ingredients',qc:'QC Records'};
+  document.getElementById('sb-label').textContent=labels[page]||'';
+  document.getElementById('sb-search').value='';filterSidebar();
+}
+function filterSidebar(){
+  const q=document.getElementById('sb-search').value.toLowerCase();
+  const list=document.getElementById('sb-list');
+  if(page==='dashboard'){list.innerHTML='';return}
+  let items=[];
+  if(page==='formulations')items=gF();
+  if(page==='batches')items=gB();
+  if(page==='ingredients')items=gI();
+  if(page==='qc')items=gQ();
+  const fi=items.filter(i=>JSON.stringify(i).toLowerCase().includes(q));
+  if(!fi.length){list.innerHTML=`<div class="empty-state"><div style="font-size:28px;margin-bottom:8px">🔍</div>No results</div>`;return}
+  list.innerHTML=fi.map(item=>{
+    let name=item.name||item.batchNo||item.formulationName||'—';
+    let meta='';
+    if(page==='formulations')meta=`${item.type} · v${item.version}`;
+    if(page==='batches')meta=`${item.date} · ${item.batchSize}${item.unit} · <span class="badge ${sb(item.status)}">${item.status}</span>`;
+    if(page==='ingredients')meta=`${item.type} · ${fc(item.costPerUnit)}`;
+    if(page==='qc')meta=`${item.testDate} · <span class="badge ${item.result==='Pass'?'badge-green':'badge-red'}">${item.result}</span>`;
+    const active=cItem===item.id?' active':'';
+    return`<div class="list-item${active}" onclick="openItem('${item.id}')"><div class="list-item-name">${name}</div><div class="list-item-meta">${meta}</div></div>`;
+  }).join('');
+}
+function openItem(id){cItem=id;vMode='detail';filterSidebar();renderMain();closeSidebar()}
+function newItemFromSidebar(){cItem=null;vMode='form';renderMain();closeSidebar()}
+function sb(s){if(s==='Released')return'badge-green';if(s==='In Progress')return'badge-amber';if(s==='On Hold'||s==='Cancelled')return'badge-red';return'badge-blue'}
+
+// ════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════
+function renderDash(){
+  const fo=gF(),ba=gB(),ing=gI(),qc=gQ();
+  const rb=[...ba].reverse().slice(0,6);
+  const rf=[...fo].reverse().slice(0,5);
+  return`<div class="sec-title">Overview</div>
+  <div class="dash-grid">
+    <div class="stat-card amber"><div class="stat-icon">🧪</div><div class="stat-value">${fo.length}</div><div class="stat-label">Formulations</div></div>
+    <div class="stat-card green"><div class="stat-icon">📋</div><div class="stat-value">${ba.length}</div><div class="stat-label">Batch Cards</div></div>
+    <div class="stat-card blue"><div class="stat-icon">⚗️</div><div class="stat-value">${ing.length}</div><div class="stat-label">Ingredients</div></div>
+    <div class="stat-card blue"><div class="stat-icon">✅</div><div class="stat-value">${qc.length}</div><div class="stat-label">QC Records</div></div>
+  </div>
+  <div class="sec-title">Recent Batch Cards</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Batch No</th><th>Formulation</th><th>Date</th><th>Size</th><th>Status</th></tr></thead><tbody>
+  ${rb.length?rb.map(b=>`<tr onclick="showPage('batches','${b.id}','detail')" style="cursor:pointer"><td><strong>${b.batchNo}</strong></td><td>${b.formulationName}</td><td>${b.date}</td><td>${b.batchSize} ${b.unit}</td><td><span class="badge ${sb(b.status)}">${b.status}</span></td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--text3)">No batches yet</td></tr>'}
+  </tbody></table></div>
+  <div class="sec-title">Recent Formulations</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Type</th><th>Finish</th><th>Version</th><th>Ingredients</th></tr></thead><tbody>
+  ${rf.length?rf.map(f=>`<tr onclick="showPage('formulations','${f.id}','detail')" style="cursor:pointer"><td><strong>${f.name}</strong></td><td>${f.type}</td><td>${f.finish}</td><td><span class="badge badge-blue">v${f.version}</span></td><td>${f.ingredients.length}</td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--text3)">No formulations yet</td></tr>'}
+  </tbody></table></div>`;
+}
+
+// ════════════════════════════════════
+// FORMULATIONS
+// ════════════════════════════════════
+function renderFList(){
+  const fo=gF();
+  return`<div class="dh">
+    <div><div class="dt">Formulations</div><div class="ds">${fo.length} formula${fo.length!==1?'s':''} on file</div></div>
+    <div class="da no-print">
+      <button class="btn bp" onclick="cItem=null;vMode='form';renderMain()">+ New Formula</button>
+      <button class="btn bpur" onclick="openXfer()">📦 Export / Import</button>
+    </div>
+  </div>
+  <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Type</th><th>Finish</th><th>Category</th><th>Version</th><th>Created</th><th>Ingredients</th></tr></thead><tbody>
+  ${fo.length?fo.map(f=>`<tr onclick="openItem('${f.id}')" style="cursor:pointer"><td><strong>${f.name}</strong></td><td>${f.type}</td><td>${f.finish}</td><td>${f.category}</td><td><span class="badge badge-blue">v${f.version}</span></td><td>${f.created}</td><td>${f.ingredients.length}</td></tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:40px">No formulations yet — create your first!</td></tr>'}
+  </tbody></table></div>`;
+}
+
+function renderFDetail(id){
+  const f=gF().find(x=>x.id===id);
+  if(!f)return'<div style="padding:40px;color:var(--text3)">Not found.</div>';
+  const tot=f.ingredients.reduce((s,i)=>s+parseFloat(i.amount||0),0);
+  const cpk=f.ingredients.reduce((s,i)=>s+(parseFloat(i.amount||0)/100)*parseFloat(i.cost||0),0);
+  return`<div class="dh">
+    <div><div class="dt">${f.name}</div><div class="ds">${f.type} · ${f.finish} · ${f.category} · <span class="badge badge-blue">v${f.version}</span></div></div>
+    <div class="da no-print">
+      <button class="btn bs" onclick="editF('${f.id}')">✏️ Edit</button>
+      <button class="btn bg-btn" onclick="createBatch('${f.id}')">📋 Batch</button>
+      <button class="btn bpdf" onclick="exportFormulationPDF('${f.id}')">📄 PDF</button>
+      <button class="btn bpur" onclick="openXfer()">📦 Export</button>
+      <button class="btn bd" onclick="confirmDel('formulation','${f.id}')">🗑</button>
+    </div>
+  </div>
+  <div class="ig">
+    <div class="ic"><div class="ic-lbl">Type</div><div class="ic-val">${f.type}</div></div>
+    <div class="ic"><div class="ic-lbl">Finish</div><div class="ic-val">${f.finish}</div></div>
+    <div class="ic"><div class="ic-lbl">Category</div><div class="ic-val">${f.category}</div></div>
+    <div class="ic"><div class="ic-lbl">Version</div><div class="ic-val">v${f.version}</div></div>
+    <div class="ic"><div class="ic-lbl">Created</div><div class="ic-val">${f.created}</div></div>
+    <div class="ic"><div class="ic-lbl">Total %</div><div class="ic-val">${tot.toFixed(1)}%</div></div>
+    <div class="ic"><div class="ic-lbl">Ingredients</div><div class="ic-val">${f.ingredients.length}</div></div>
+    <div class="ic"><div class="ic-lbl">Est. Cost/kg</div><div class="ic-val" style="color:var(--accent)">${fc(cpk)}</div></div>
+  </div>
+  ${f.notes?`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:18px"><div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Notes</div><div style="font-size:13px;color:var(--text2)">${f.notes}</div></div>`:''}
+  <div class="sec-title">Formula Composition — Total: ${tot.toFixed(1)}%</div>
+  <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Ingredient</th><th>Role</th><th>Amount</th><th>Unit</th><th>Cost/Unit (AED)</th><th>Formula Cost</th><th>%</th></tr></thead><tbody>
+  ${f.ingredients.map((i,idx)=>{
+    const pct=tot>0?(parseFloat(i.amount)/tot*100):0;
+    return`<tr><td style="color:var(--text3)">${idx+1}</td><td><strong>${i.name}</strong></td><td><span class="tag">${i.role}</span></td>
+      <td style="font-family:'DM Mono',monospace">${i.amount}</td><td>${i.unit}</td>
+      <td style="font-family:'DM Mono',monospace">${fc(i.cost)}</td>
+      <td style="font-family:'DM Mono',monospace">${fc((parseFloat(i.amount||0)/100)*parseFloat(i.cost||0))}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><span style="min-width:36px;font-size:12px">${pct.toFixed(1)}%</span><div class="pbar-wrap" style="flex:1"><div class="pbar" style="width:${Math.min(pct,100)}%"></div></div></div></td>
+    </tr>`;
+  }).join('')}</tbody></table></div>
+  <div class="sec-title">Associated Batches</div>${batchesFor(f.id)}`;
+}
+function batchesFor(fid){
+  const ba=gB().filter(b=>b.formulationId===fid);
+  if(!ba.length)return`<div style="color:var(--text3);font-size:13px;margin-bottom:18px">No batches yet.</div>`;
+  return`<div class="tbl-wrap"><table><thead><tr><th>Batch No</th><th>Date</th><th>Size</th><th>Operator</th><th>Status</th></tr></thead><tbody>
+  ${ba.map(b=>`<tr onclick="showPage('batches','${b.id}','detail')" style="cursor:pointer"><td><strong>${b.batchNo}</strong></td><td>${b.date}</td><td>${b.batchSize} ${b.unit}</td><td>${b.operator}</td><td><span class="badge ${sb(b.status)}">${b.status}</span></td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+// ── Formulation Form ──
+let PI=[];
+const ROLES=['Pigment','Binder','Solvent','Extender','Thickener','Defoamer','Surfactant','Preservative','Drier','Coalescing Aid','Curing Agent','pH Adjuster','Additive','Other'];
+const UNITS=['%','g','kg','L','mL','parts'];
+function initPI(id){const f=id?gF().find(x=>x.id===id):null;PI=f?JSON.parse(JSON.stringify(f.ingredients)):[{id:DB.id(),name:'',role:'Pigment',amount:'',unit:'%',cost:''}]}
+
+function renderFForm(id){
+  const f=id?gF().find(x=>x.id===id):null;
+  return`<div class="dh"><div class="dt">${f?'Edit Formulation':'New Formulation'}</div></div>
+  <div class="f-panel">
+    <div class="f-panel-title">Basic Information</div>
+    <div class="f-grid">
+      <div class="fg full"><label>Formula Name *</label><input id="fn" value="${esc(f?.name||'')}" placeholder="e.g. Premium Interior Latex — White"></div>
+      <div class="fg"><label>Type</label><select id="ft">${['Interior Paint','Exterior Paint','Primer','Topcoat','Varnish','Lacquer','Stain','Sealant','Floor Coating','Roof Coating','Other'].map(t=>`<option${f?.type===t?' selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="fg"><label>Finish</label><select id="ff">${['Flat','Matte','Eggshell','Satin','Semi-Gloss','Gloss','High-Gloss'].map(t=>`<option${f?.finish===t?' selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="fg"><label>Category</label><select id="fcat">${['Architectural','Industrial','Marine','Automotive','Decorative','Other'].map(t=>`<option${f?.category===t?' selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="fg"><label>Version</label><input id="fv" value="${esc(f?.version||'1.0')}"></div>
+      <div class="fg"><label>Date Created</label><input type="date" id="fcr" value="${f?.created||today()}"></div>
+      <div class="fg full"><label>Notes</label><textarea id="fno" placeholder="Mixing instructions, special notes...">${esc(f?.notes||'')}</textarea></div>
+    </div>
+  </div>
+  <div class="f-panel">
+    <div class="f-panel-title">Ingredients / Raw Materials <button class="bi add" onclick="addPI()">＋ Add Row</button></div>
+    <div class="ingr-tbl-wrap">
+      <table class="ingr-tbl">
+        <thead><tr><th>Ingredient Name</th><th>Role</th><th>Amount</th><th>Unit</th><th>Cost/Unit (AED)</th><th></th></tr></thead>
+        <tbody id="pi-tb">${PI.map(i=>piRow(i)).join('')}</tbody>
+      </table>
+    </div>
+    <div style="margin-top:9px;font-size:12px;color:var(--text3)">💡 Typing an ingredient name shows suggestions from your catalogue — selecting one auto-fills the price.</div>
+  </div>
+  <div class="btn-row no-print">
+    <button class="btn bp" onclick="saveFForm('${f?.id||''}')">💾 Save Formulation</button>
+    <button class="btn bs" onclick="cancelF()">Cancel</button>
+  </div>`;
+}
+function piRow(i){
+  return`<tr id="pir-${i.id}">
+    <td style="position:relative;overflow:visible;min-width:160px">
+      <div class="ac-wrap"><input id="pin-${i.id}" value="${esc(i.name)}" placeholder="Ingredient name" oninput="acIn('${i.id}',this.value)" onblur="acClose('${i.id}')" autocomplete="off"><div class="ac-list" id="acl-${i.id}"></div></div>
+    </td>
+    <td><select id="pir2-${i.id}">${ROLES.map(r=>`<option${i.role===r?' selected':''}>${r}</option>`).join('')}</select></td>
+    <td><input type="number" id="pia-${i.id}" value="${i.amount||''}" placeholder="0" style="width:72px"></td>
+    <td><select id="piu-${i.id}">${UNITS.map(u=>`<option${i.unit===u?' selected':''}>${u}</option>`).join('')}</select></td>
+    <td><input type="number" id="pic-${i.id}" value="${i.cost||''}" placeholder="0.00" step="0.01"></td>
+    <td><button class="bi" onclick="rmPI('${i.id}')">✕</button></td>
+  </tr>`;
+}
+function acIn(rowId,val){
+  const ing=gI();const q=val.toLowerCase().trim();const ac=document.getElementById('acl-'+rowId);
+  if(!q){ac.style.display='none';return}
+  const mx=ing.filter(i=>i.name.toLowerCase().includes(q)).slice(0,8);
+  if(!mx.length){ac.style.display='none';return}
+  ac.innerHTML=mx.map(m=>`<div class="ac-item" onmousedown="acSel('${rowId}','${esc(m.name)}',${m.costPerUnit})">${m.name}<span class="ac-price">${fc(m.costPerUnit)}</span></div>`).join('');
+  ac.style.display='block';
+}
+function acClose(rowId){setTimeout(()=>{const ac=document.getElementById('acl-'+rowId);if(ac)ac.style.display='none'},200)}
+function acSel(rowId,name,cost){
+  const ni=document.getElementById('pin-'+rowId);const ci=document.getElementById('pic-'+rowId);
+  if(ni)ni.value=name;if(ci)ci.value=cost;
+  const ac=document.getElementById('acl-'+rowId);if(ac)ac.style.display='none';
+  const p=PI.find(x=>x.id===rowId);if(p){p.name=name;p.cost=cost}
+}
+function addPI(){
+  const ni={id:DB.id(),name:'',role:'Pigment',amount:'',unit:'%',cost:''};PI.push(ni);
+  const tb=document.getElementById('pi-tb');const tr=document.createElement('tr');
+  tr.id='pir-'+ni.id;tr.innerHTML=piRow(ni).replace(/^<tr[^>]*>/,'').replace(/<\/tr>$/,'');tb.appendChild(tr);
+}
+function rmPI(id){PI=PI.filter(i=>i.id!==id);const r=document.getElementById('pir-'+id);if(r)r.remove()}
+function saveFForm(id){
+  const name=document.getElementById('fn').value.trim();
+  if(!name){toast('Formula name required.','error');return}
+  const tb=document.getElementById('pi-tb');
+  const rows=Array.from(tb.querySelectorAll('tr'));
+  const ingredients=rows.map(row=>{
+    const rid=row.id.replace('pir-','');
+    return{id:rid||DB.id(),name:(document.getElementById('pin-'+rid)||{}).value||'',role:(document.getElementById('pir2-'+rid)||{}).value||'Other',amount:(document.getElementById('pia-'+rid)||{}).value||'',unit:(document.getElementById('piu-'+rid)||{}).value||'%',cost:(document.getElementById('pic-'+rid)||{}).value||''};
+  }).filter(i=>i.name.trim());
+  const forms=gF();
+  const obj={id:id||DB.id(),name,type:document.getElementById('ft').value,finish:document.getElementById('ff').value,category:document.getElementById('fcat').value,version:document.getElementById('fv').value,created:document.getElementById('fcr').value,notes:document.getElementById('fno').value,ingredients};
+  if(id){const idx=forms.findIndex(x=>x.id===id);forms[idx]=obj}else forms.push(obj);
+  sF(forms);syncIngredients();cItem=obj.id;vMode='detail';renderSidebar();renderMain();
+  toast('Formulation saved! Ingredient catalogue updated.','success');
+}
+function editF(id){initPI(id);cItem=id;vMode='form';renderMain()}
+function createBatch(fid){
+  cItem=null;vMode='form';page='batches';
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-batches').classList.add('active');
+  renderSidebar();renderMain();
+  setTimeout(()=>{const s=document.getElementById('bf');if(s)s.value=fid},50);
+}
+function cancelF(){cItem=null;vMode='list';renderSidebar();renderMain()}
+
+// ════════════════════════════════════
+// BATCHES
+// ════════════════════════════════════
+function renderBList(){
+  const ba=gB();
+  return`<div class="dh">
+    <div><div class="dt">Batch Cards</div><div class="ds">${ba.length} batch${ba.length!==1?'es':''} recorded</div></div>
+    <div class="da no-print"><button class="btn bp" onclick="cItem=null;vMode='form';renderMain()">+ New Batch</button></div>
+  </div>
+  <div class="tbl-wrap"><table><thead><tr><th>Batch No</th><th>Formulation</th><th>Date</th><th>Size</th><th>Operator</th><th>pH</th><th>Viscosity</th><th>Status</th></tr></thead><tbody>
+  ${ba.length?ba.map(b=>`<tr onclick="openItem('${b.id}')" style="cursor:pointer"><td><strong>${b.batchNo}</strong></td><td>${b.formulationName}</td><td>${b.date}</td><td>${b.batchSize} ${b.unit}</td><td>${b.operator}</td><td>${b.pH??'—'}</td><td>${b.viscosity??'—'}</td><td><span class="badge ${sb(b.status)}">${b.status}</span></td></tr>`).join(''):'<tr><td colspan="8" style="text-align:center;color:var(--text3);padding:40px">No batch cards yet</td></tr>'}
+  </tbody></table></div>`;
+}
+function renderBDetail(id){
+  const b=gB().find(x=>x.id===id);if(!b)return'';
+  const steps=['Pending','Weighing','Mixing','Quality Check','Filling','Released'];
+  const si=steps.indexOf(b.status);
+  return`<div class="dh">
+    <div><div class="dt">${b.batchNo}</div><div class="ds">${b.formulationName} · ${b.batchSize} ${b.unit}</div></div>
+    <div class="da no-print">
+      <button class="btn bs" onclick="editB('${b.id}')">✏️ Edit</button>
+      <button class="btn bg-btn" onclick="addQCFor('${b.id}')">✅ Add QC</button>
+      <button class="btn bpdf" onclick="exportBatchPDF('${b.id}')">📄 PDF</button>
+      <button class="btn bd" onclick="confirmDel('batch','${b.id}')">🗑</button>
+    </div>
+  </div>
+  <div class="stl">${steps.map((s,i)=>`<div class="st-step ${i<si?'done':i===si?'active':''}" onclick="updBStatus('${b.id}','${s}')">${s}</div>`).join('')}</div>
+  <div class="ig">
+    <div class="ic"><div class="ic-lbl">Batch No</div><div class="ic-val">${b.batchNo}</div></div>
+    <div class="ic"><div class="ic-lbl">Date</div><div class="ic-val">${b.date}</div></div>
+    <div class="ic"><div class="ic-lbl">Operator</div><div class="ic-val">${b.operator}</div></div>
+    <div class="ic"><div class="ic-lbl">Batch Size</div><div class="ic-val">${b.batchSize} ${b.unit}</div></div>
+    <div class="ic"><div class="ic-lbl">Mixing Time</div><div class="ic-val">${b.mixingTime?b.mixingTime+' min':'—'}</div></div>
+    <div class="ic"><div class="ic-lbl">Temperature</div><div class="ic-val">${b.temperature?b.temperature+'°C':'—'}</div></div>
+    <div class="ic"><div class="ic-lbl">Viscosity (KU)</div><div class="ic-val" style="color:var(--blue)">${b.viscosity??'—'}</div></div>
+    <div class="ic"><div class="ic-lbl">pH</div><div class="ic-val" style="color:var(--green)">${b.pH??'—'}</div></div>
+    <div class="ic"><div class="ic-lbl">Density (g/mL)</div><div class="ic-val">${b.density??'—'}</div></div>
+    <div class="ic"><div class="ic-lbl">Status</div><div class="ic-val"><span class="badge ${sb(b.status)}">${b.status}</span></div></div>
+  </div>
+  ${b.notes?`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:18px"><div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Production Notes</div><div style="font-size:13px;color:var(--text2)">${b.notes}</div></div>`:''}
+  <div class="sec-title">Formula Reference</div>${formulaRef(b.formulationId,b.batchSize,b.unit)}
+  <div class="sec-title">QC Records</div>${qcForBatch(b.batchNo)}`;
+}
+function formulaRef(fid,bs,bu){
+  const f=gF().find(x=>x.id===fid);
+  if(!f)return`<div style="color:var(--text3);font-size:13px;margin-bottom:18px">Formula not found.</div>`;
+  return`<div class="tbl-wrap"><table><thead><tr><th>#</th><th>Ingredient</th><th>Role</th><th>Formula %</th><th>Qty for ${bs} ${bu}</th></tr></thead><tbody>
+  ${f.ingredients.map((i,idx)=>{const qty=(parseFloat(i.amount||0)/100*parseFloat(bs||0)).toFixed(2);
+    return`<tr><td style="color:var(--text3)">${idx+1}</td><td><strong>${i.name}</strong></td><td><span class="tag">${i.role}</span></td><td style="font-family:'DM Mono',monospace">${i.amount}${i.unit}</td><td style="color:var(--accent);font-family:'DM Mono',monospace;font-weight:600">${qty} ${bu}</td></tr>`;
+  }).join('')}</tbody></table></div>`;
+}
+function qcForBatch(bno){
+  const r=gQ().filter(q=>q.batchNo===bno);
+  if(!r.length)return`<div style="color:var(--text3);font-size:13px;margin-bottom:18px">No QC records for this batch.</div>`;
+  return`<div class="tbl-wrap"><table><thead><tr><th>Test Date</th><th>Inspector</th><th>Viscosity</th><th>pH</th><th>Density</th><th>Hiding</th><th>Result</th></tr></thead><tbody>
+  ${r.map(q=>`<tr onclick="showPage('qc','${q.id}','detail')" style="cursor:pointer"><td>${q.testDate}</td><td>${q.inspector}</td><td>${q.viscosity??'—'}</td><td>${q.pH??'—'}</td><td>${q.density??'—'}</td><td>${q.hiding??'—'}%</td><td><span class="badge ${q.result==='Pass'?'badge-green':'badge-red'}">${q.result}</span></td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+function renderBForm(id){
+  const b=id?gB().find(x=>x.id===id):null;const fo=gF();
+  return`<div class="dh"><div class="dt">${b?'Edit Batch Card':'New Batch Card'}</div></div>
+  <div class="f-panel"><div class="f-panel-title">Batch Information</div><div class="f-grid">
+    <div class="fg"><label>Batch Number *</label><input id="bno" value="${esc(b?.batchNo||autoNext())}" placeholder="B-2025-001"></div>
+    <div class="fg"><label>Formulation *</label><select id="bf"><option value="">-- Select --</option>${fo.map(f=>`<option value="${f.id}"${b?.formulationId===f.id?' selected':''}>${f.name}</option>`).join('')}</select></div>
+    <div class="fg"><label>Batch Size *</label><input type="number" id="bsz" value="${b?.batchSize||''}" placeholder="500"></div>
+    <div class="fg"><label>Unit</label><select id="bu">${['L','kg','gal','lb'].map(u=>`<option${b?.unit===u?' selected':''}>${u}</option>`).join('')}</select></div>
+    <div class="fg"><label>Date *</label><input type="date" id="bd" value="${b?.date||today()}"></div>
+    <div class="fg"><label>Operator</label><input id="bop" value="${esc(b?.operator||'')}" placeholder="Operator name"></div>
+    <div class="fg"><label>Status</label><select id="bst">${['Pending','Weighing','Mixing','Quality Check','Filling','Released','On Hold','Cancelled'].map(s=>`<option${b?.status===s?' selected':''}>${s}</option>`).join('')}</select></div>
+    <div class="fg"><label>Mixing Time (min)</label><input type="number" id="bmt" value="${b?.mixingTime||''}" placeholder="45"></div>
+  </div></div>
+  <div class="f-panel"><div class="f-panel-title">Physical Properties</div><div class="f-grid">
+    <div class="fg"><label>Temperature (°C)</label><input type="number" id="btp" value="${b?.temperature||''}" placeholder="22"></div>
+    <div class="fg"><label>Viscosity (KU)</label><input type="number" id="bvc" value="${b?.viscosity||''}" placeholder="95"></div>
+    <div class="fg"><label>pH</label><input type="number" step="0.01" id="bph" value="${b?.pH||''}" placeholder="8.5"></div>
+    <div class="fg"><label>Density (g/mL)</label><input type="number" step="0.001" id="bdn" value="${b?.density||''}" placeholder="1.38"></div>
+    <div class="fg full"><label>Production Notes</label><textarea id="bnt" placeholder="Deviations, observations...">${esc(b?.notes||'')}</textarea></div>
+  </div></div>
+  <div class="btn-row no-print">
+    <button class="btn bp" onclick="saveBForm('${b?.id||''}')">💾 Save Batch Card</button>
+    <button class="btn bs" onclick="cancelF()">Cancel</button>
+  </div>`;
+}
+function autoNext(){const ba=gB();if(!ba.length)return`B-${new Date().getFullYear()}-001`;const ns=ba.map(b=>{const m=b.batchNo.match(/(\d+)$/);return m?parseInt(m[1]):0});return`B-${new Date().getFullYear()}-${String(Math.max(...ns)+1).padStart(3,'0')}`}
+function saveBForm(id){
+  const no=document.getElementById('bno').value.trim();
+  const fid=document.getElementById('bf').value;
+  const sz=document.getElementById('bsz').value;
+  if(!no){toast('Batch number required.','error');return}
+  if(!fid){toast('Select a formulation.','error');return}
+  if(!sz){toast('Batch size required.','error');return}
+  const f=gF().find(x=>x.id===fid);const ba=gB();
+  const obj={id:id||DB.id(),batchNo:no,formulationId:fid,formulationName:f?.name||'',batchSize:parseFloat(sz),unit:document.getElementById('bu').value,date:document.getElementById('bd').value,operator:document.getElementById('bop').value,status:document.getElementById('bst').value,mixingTime:document.getElementById('bmt').value||null,temperature:document.getElementById('btp').value||null,viscosity:document.getElementById('bvc').value||null,pH:document.getElementById('bph').value||null,density:document.getElementById('bdn').value||null,notes:document.getElementById('bnt').value};
+  if(id){const idx=ba.findIndex(x=>x.id===id);ba[idx]=obj}else ba.push(obj);
+  sB(ba);cItem=obj.id;vMode='detail';renderSidebar();renderMain();toast('Batch card saved!','success');
+}
+function editB(id){cItem=id;vMode='form';renderMain()}
+function updBStatus(id,status){const ba=gB();const b=ba.find(x=>x.id===id);if(b){b.status=status;sB(ba);renderMain();toast(`Status: ${status}`,'success')}}
+function addQCFor(bid){
+  const b=gB().find(x=>x.id===bid);
+  page='qc';cItem=null;vMode='form';
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-qc').classList.add('active');
+  renderSidebar();renderMain();
+  setTimeout(()=>{const bn=document.getElementById('qbn');const fn=document.getElementById('qfn');if(bn)bn.value=b?.batchNo||'';if(fn)fn.value=b?.formulationName||''},50);
+}
+
+// ════════════════════════════════════
+// INGREDIENTS
+// ════════════════════════════════════
+function renderIList(){
+  const ing=gI();
+  return`<div class="dh">
+    <div><div class="dt">Ingredients</div><div class="ds">${ing.length} raw material${ing.length!==1?'s':''} · Auto-synced from Formulations</div></div>
+    <div class="da no-print">
+      <button class="btn bp" onclick="cItem=null;vMode='form';renderMain()">+ New Ingredient</button>
+      <button class="btn bpdf" onclick="exportIngredientsPDF()">📄 Export PDF</button>
+    </div>
+  </div>
+  <div class="info-banner">ℹ️ Ingredients are auto-added &amp; prices updated whenever you save a Formulation. You can also add or edit them manually here.</div>
+  <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Supplier</th><th>CAS No.</th><th>Type</th><th>Cost/Unit (AED)</th><th>Notes</th><th></th></tr></thead><tbody>
+  ${ing.length?ing.map(i=>`<tr>
+    <td><strong>${i.name}</strong></td><td>${i.supplier||'—'}</td>
+    <td><span style="font-family:'DM Mono',monospace;font-size:12px">${i.casNo||'—'}</span></td>
+    <td><span class="tag">${i.type}</span></td>
+    <td style="color:var(--accent);font-weight:500;font-family:'DM Mono',monospace">${fc(i.costPerUnit)}</td>
+    <td style="font-size:12px;color:var(--text3)">${i.notes||'—'}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="bi add" onclick="editI('${i.id}')">✏️</button>
+      <button class="bi" onclick="confirmDel('ingredient','${i.id}')">🗑</button>
+    </div></td>
+  </tr>`).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--text3);padding:40px">No ingredients yet.</td></tr>'}
+  </tbody></table></div>`;
+}
+function renderIForm(id){
+  const i=id?gI().find(x=>x.id===id):null;
+  return`<div class="dh"><div class="dt">${i?'Edit Ingredient':'New Ingredient'}</div></div>
+  <div class="f-panel"><div class="f-panel-title">Ingredient Details</div><div class="f-grid">
+    <div class="fg full"><label>Name *</label><input id="in" value="${esc(i?.name||'')}" placeholder="e.g. Titanium Dioxide"></div>
+    <div class="fg"><label>Supplier</label><input id="is" value="${esc(i?.supplier||'')}" placeholder="Supplier name"></div>
+    <div class="fg"><label>CAS Number</label><input id="icas" value="${esc(i?.casNo||'')}" placeholder="13463-67-7"></div>
+    <div class="fg"><label>Type</label><select id="it">${ROLES.map(t=>`<option${i?.type===t?' selected':''}>${t}</option>`).join('')}</select></div>
+    <div class="fg"><label>Cost per Unit (AED)</label><input type="number" step="0.01" id="ic" value="${i?.costPerUnit||''}" placeholder="0.00"></div>
+    <div class="fg full"><label>Notes</label><textarea id="ino" placeholder="Hazards, storage...">${esc(i?.notes||'')}</textarea></div>
+  </div></div>
+  <div class="btn-row no-print">
+    <button class="btn bp" onclick="saveIForm('${i?.id||''}')">💾 Save</button>
+    <button class="btn bs" onclick="cancelF()">Cancel</button>
+  </div>`;
+}
+function saveIForm(id){
+  const name=document.getElementById('in').value.trim();
+  if(!name){toast('Name required.','error');return}
+  const ing=gI();
+  const obj={id:id||DB.id(),name,supplier:document.getElementById('is').value,casNo:document.getElementById('icas').value,type:document.getElementById('it').value,costPerUnit:parseFloat(document.getElementById('ic').value)||0,notes:document.getElementById('ino').value};
+  if(id){const idx=ing.findIndex(x=>x.id===id);ing[idx]=obj}else ing.push(obj);
+  sI(ing);cItem=null;vMode='list';renderSidebar();renderMain();toast('Ingredient saved!','success');
+}
+function editI(id){cItem=id;vMode='form';renderMain()}
+
+// ════════════════════════════════════
+// QC RECORDS
+// ════════════════════════════════════
+function renderQList(){
+  const qcs=gQ();
+  return`<div class="dh">
+    <div><div class="dt">QC Records</div><div class="ds">${qcs.length} test${qcs.length!==1?'s':''} on file</div></div>
+    <div class="da no-print">
+      <button class="btn bp" onclick="cItem=null;vMode='form';renderMain()">+ New QC Record</button>
+    </div>
+  </div>
+  <div class="tbl-wrap"><table><thead><tr><th>Batch No</th><th>Formulation</th><th>Test Date</th><th>Inspector</th><th>Viscosity</th><th>pH</th><th>Density</th><th>Hiding %</th><th>Result</th></tr></thead><tbody>
+  ${qcs.length?qcs.map(q=>`<tr onclick="openItem('${q.id}')" style="cursor:pointer"><td><strong>${q.batchNo}</strong></td><td>${q.formulationName}</td><td>${q.testDate}</td><td>${q.inspector}</td><td>${q.viscosity??'—'}</td><td>${q.pH??'—'}</td><td>${q.density??'—'}</td><td>${q.hiding??'—'}</td><td><span class="badge ${q.result==='Pass'?'badge-green':'badge-red'}">${q.result}</span></td></tr>`).join(''):'<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:40px">No QC records yet</td></tr>'}
+  </tbody></table></div>`;
+}
+function renderQDetail(id){
+  const q=gQ().find(x=>x.id===id);if(!q)return'';
+  function pass(val,spec){if(!val||!spec||spec==='N/A')return null;const m=spec.match(/([\d.]+)[–\-]([\d.]+)/);if(m)return parseFloat(val)>=parseFloat(m[1])&&parseFloat(val)<=parseFloat(m[2]);const gt=spec.match(/>(\d+)/);if(gt)return parseFloat(val)>parseFloat(gt[1]);const lt=spec.match(/<(\d+)/);if(lt)return parseFloat(val)<parseFloat(lt[1]);return null}
+  function row(lbl,val,spec){const p=pass(val,spec);const c=p===null?'var(--text)':p?'var(--green)':'var(--red)';
+    return`<tr><td><strong>${lbl}</strong></td><td style="color:${c};font-weight:500">${val??'—'}</td><td style="color:var(--text3)">${spec}</td><td>${p===null?'—':p?'<span class="badge badge-green">✓ Pass</span>':'<span class="badge badge-red">✗ Fail</span>'}</td></tr>`}
+  return`<div class="dh">
+    <div><div class="dt">QC — ${q.batchNo}</div><div class="ds">${q.formulationName} · ${q.testDate} · ${q.inspector}</div></div>
+    <div class="da no-print">
+      <button class="btn bs" onclick="editQ('${q.id}')">✏️ Edit</button>
+      <button class="btn bpdf" onclick="exportQCPDF('${q.id}')">📄 PDF</button>
+      <button class="btn bd" onclick="confirmDel('qc','${q.id}')">🗑</button>
+    </div>
+  </div>
+  <div style="margin-bottom:18px"><span class="badge ${q.result==='Pass'?'badge-green':'badge-red'}" style="font-size:14px;padding:5px 16px;border-radius:6px">${q.result==='Pass'?'✓ QUALITY APPROVED':'✗ QUALITY REJECTED'}</span></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Parameter</th><th>Measured Value</th><th>Specification</th><th>Status</th></tr></thead><tbody>
+    ${row('Viscosity (KU)',q.viscosity,q.viscositySpec)}
+    ${row('pH',q.pH,q.pHSpec)}
+    ${row('Density (g/mL)',q.density,q.densitySpec)}
+    ${row('Fineness of Grind (µm)',q.fineness,q.finenessSpec)}
+    ${row('Hiding Power (%)',q.hiding,q.hidingSpec)}
+  </tbody></table></div>
+  ${q.notes?`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-top:16px"><div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Inspector Notes</div><div style="font-size:13px;color:var(--text2)">${q.notes}</div></div>`:''}`;
+}
+function renderQForm(id){
+  const q=id?gQ().find(x=>x.id===id):null;
+  return`<div class="dh"><div class="dt">${q?'Edit QC Record':'New QC Record'}</div></div>
+  <div class="f-panel"><div class="f-panel-title">Identification</div><div class="f-grid">
+    <div class="fg"><label>Batch Number *</label><input id="qbn" value="${esc(q?.batchNo||'')}" placeholder="B-2025-001"></div>
+    <div class="fg"><label>Formulation Name</label><input id="qfn" value="${esc(q?.formulationName||'')}" placeholder="Formula name"></div>
+    <div class="fg"><label>Test Date *</label><input type="date" id="qtd" value="${q?.testDate||today()}"></div>
+    <div class="fg"><label>Inspector</label><input id="qi" value="${esc(q?.inspector||'')}" placeholder="Inspector name"></div>
+    <div class="fg"><label>Overall Result</label><select id="qr"><option${q?.result==='Pass'?' selected':''}>Pass</option><option${q?.result==='Fail'?' selected':''}>Fail</option></select></div>
+  </div></div>
+  <div class="f-panel"><div class="f-panel-title">Test Results vs Specifications</div><div class="f-grid">
+    <div class="fg"><label>Viscosity (KU)</label><input type="number" id="qv" value="${q?.viscosity||''}" placeholder="95"></div>
+    <div class="fg"><label>Viscosity Spec</label><input id="qvs" value="${esc(q?.viscositySpec||'85–110')}"></div>
+    <div class="fg"><label>pH</label><input type="number" step="0.01" id="qph" value="${q?.pH||''}" placeholder="8.5"></div>
+    <div class="fg"><label>pH Spec</label><input id="qphs" value="${esc(q?.pHSpec||'8.0–9.0')}"></div>
+    <div class="fg"><label>Density (g/mL)</label><input type="number" step="0.001" id="qd" value="${q?.density||''}" placeholder="1.38"></div>
+    <div class="fg"><label>Density Spec</label><input id="qds" value="${esc(q?.densitySpec||'1.35–1.42')}"></div>
+    <div class="fg"><label>Fineness (µm)</label><input type="number" id="qfn2" value="${q?.fineness||''}" placeholder="30"></div>
+    <div class="fg"><label>Fineness Spec</label><input id="qfs" value="${esc(q?.finenessSpec||'<40')}"></div>
+    <div class="fg"><label>Hiding Power (%)</label><input type="number" step="0.1" id="qhp" value="${q?.hiding||''}" placeholder="98"></div>
+    <div class="fg"><label>Hiding Spec</label><input id="qhs" value="${esc(q?.hidingSpec||'>95')}"></div>
+    <div class="fg full"><label>Inspector Notes</label><textarea id="qno" placeholder="Observations, deviations...">${esc(q?.notes||'')}</textarea></div>
+  </div></div>
+  <div class="btn-row no-print">
+    <button class="btn bp" onclick="saveQForm('${q?.id||''}')">💾 Save QC Record</button>
+    <button class="btn bs" onclick="cancelF()">Cancel</button>
+  </div>`;
+}
+function saveQForm(id){
+  const bno=document.getElementById('qbn').value.trim();
+  if(!bno){toast('Batch number required.','error');return}
+  const qcs=gQ();
+  const obj={id:id||DB.id(),batchNo:bno,formulationName:document.getElementById('qfn').value,testDate:document.getElementById('qtd').value,inspector:document.getElementById('qi').value,result:document.getElementById('qr').value,viscosity:document.getElementById('qv').value||null,viscositySpec:document.getElementById('qvs').value,pH:document.getElementById('qph').value||null,pHSpec:document.getElementById('qphs').value,density:document.getElementById('qd').value||null,densitySpec:document.getElementById('qds').value,fineness:document.getElementById('qfn2').value||null,finenessSpec:document.getElementById('qfs').value,hiding:document.getElementById('qhp').value||null,hidingSpec:document.getElementById('qhs').value,notes:document.getElementById('qno').value};
+  if(id){const idx=qcs.findIndex(x=>x.id===id);qcs[idx]=obj}else qcs.push(obj);
+  sQ(qcs);cItem=obj.id;vMode='detail';renderSidebar();renderMain();toast('QC record saved!','success');
+}
+function editQ(id){cItem=id;vMode='form';renderMain()}
+
+// ════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════
+function confirmDel(type,id){
+  document.getElementById('mc-title').textContent='Confirm Delete';
+  document.getElementById('mc-body').textContent=`Delete this ${type}? This cannot be undone.`;
+  document.getElementById('mc-ok').onclick=()=>{doDel(type,id);closeMo('mo-confirm')};
+  openMo('mo-confirm');
+}
+function doDel(type,id){
+  if(type==='formulation')sF(gF().filter(x=>x.id!==id));
+  if(type==='batch')sB(gB().filter(x=>x.id!==id));
+  if(type==='ingredient')sI(gI().filter(x=>x.id!==id));
+  if(type==='qc')sQ(gQ().filter(x=>x.id!==id));
+  cItem=null;vMode='list';renderSidebar();renderMain();toast('Deleted.','success');
+}
+function openMo(id){document.getElementById(id).classList.add('open')}
+function closeMo(id){document.getElementById(id).classList.remove('open')}
+function toast(msg,type='success'){
+  const c=document.getElementById('toast-c');const d=document.createElement('div');
+  d.className=`toast ${type}`;d.textContent=msg;c.appendChild(d);setTimeout(()=>d.remove(),3200);
+}
+function today(){return new Date().toISOString().split('T')[0]}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function toggleSidebar(){const s=document.getElementById('sidebar'),o=document.getElementById('sidebar-overlay');s.classList.toggle('open');o.style.display=s.classList.contains('open')?'block':'none'}
+function closeSidebar(){const s=document.getElementById('sidebar'),o=document.getElementById('sidebar-overlay');s.classList.remove('open');o.style.display='none'}
+
+// ════════════════════════════════════
+// INIT
+// ════════════════════════════════════
+seedIfEmpty();
+initPI(null);
+initPWA();
+showPage('dashboard');
+</script>
+</body>
+</html>
