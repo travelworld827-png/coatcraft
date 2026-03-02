@@ -21,6 +21,8 @@
 <link rel="apple-touch-icon" id="apple-icon">
 
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- SheetJS for Excel parsing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 /* ═══════════════════════ APP VARIABLES ═══════════════════════ */
 :root{
@@ -40,11 +42,15 @@ html,body{height:100%;overflow:hidden}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column}
 
 /* ── TOPBAR ── */
-.topbar{height:58px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;z-index:100}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--accent);line-height:1;white-space:nowrap;display:flex;align-items:center;gap:8px}
-.logo-icon{width:28px;height:28px;background:var(--accent-dim);border:1px solid var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
-.logo span{color:var(--text2)}
-.tdivider{width:1px;height:28px;background:var(--border)}
+.topbar{height:64px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;z-index:100}
+.logo{white-space:nowrap;display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer}
+.logo-icon{width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.logo-text-wrap{display:flex;flex-direction:column;gap:1px;line-height:1}
+.logo-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--accent);line-height:1}
+.logo-title span{color:var(--text3);font-size:20px}
+.logo-creator{font-size:9px;font-weight:600;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;line-height:1;margin-top:2px}
+.logo-creator em{color:var(--accent);font-style:normal;font-weight:700}
+.tdivider{width:1px;height:32px;background:var(--border)}
 .nav-tabs{display:flex;gap:4px;flex:1;overflow-x:auto;scrollbar-width:none}
 .nav-tabs::-webkit-scrollbar{display:none}
 .nav-tab{padding:7px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all .15s;white-space:nowrap;border:none;background:none;display:flex;align-items:center;gap:6px}
@@ -207,20 +213,47 @@ textarea{resize:vertical;min-height:78px}
 /* print media — only used as fallback; PDFs open in popup window */
 @media print{body{display:none}}
 
+/* ── MOBILE BOTTOM NAV ── */
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:300;flex-direction:row;height:58px}
+.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:none;border:none;color:var(--text3);font-size:9.5px;font-weight:600;cursor:pointer;gap:3px;transition:color .15s;padding:6px 2px;letter-spacing:.3px;font-family:inherit}
+.mob-nav-btn .mn-icon{font-size:18px;line-height:1}
+.mob-nav-btn.active{color:var(--accent)}
+.mob-nav-btn:hover{color:var(--text)}
+
+/* ── BREADCRUMB BACK BAR ── */
+.breadcrumb-bar{display:none;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);margin:-14px -14px 14px;position:sticky;top:0;z-index:100}
+.bc-back{background:none;border:none;color:var(--accent);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;padding:4px 0}
+.bc-sep{color:var(--text3);font-size:12px}
+.bc-current{font-size:13px;color:var(--text2);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
 /* ── RESPONSIVE ── */
 @media(max-width:768px){
   .hamburger{display:block}
-  .sidebar{position:fixed;top:58px;left:0;bottom:0;z-index:200;transform:translateX(-100%);box-shadow:4px 0 20px rgba(0,0,0,.5)}
+  .sidebar{position:fixed;top:64px;left:0;bottom:58px;z-index:200;transform:translateX(-100%);box-shadow:4px 0 20px rgba(0,0,0,.5)}
   .sidebar.open{transform:translateX(0)}
   .tdivider,.nav-tabs{display:none}
-  .main{padding:14px}
+  .main{padding:14px;padding-bottom:72px}
   .f-grid{grid-template-columns:1fr}
   .dash-grid{grid-template-columns:1fr 1fr}
   .dh{flex-direction:column}
   .ig{grid-template-columns:1fr 1fr}
   .st-step{font-size:9.5px;padding:9px 3px}
+  .mob-nav{display:flex}
+  .breadcrumb-bar{display:flex}
+  /* Make detail header actions wrap better */
+  .da{gap:6px}
+  .da .btn{padding:7px 12px;font-size:12px}
+  /* Info grid 2-col on small screens */
+  .ig{grid-template-columns:1fr 1fr}
+  /* Tables scroll horizontally */
+  .tbl-wrap{overflow-x:auto}
+  /* Install banner above bottom nav */
+  #install-banner{bottom:58px}
 }
-@media(max-width:400px){.logo-text{display:none}}
+@media(max-width:400px){
+  .logo-text{display:none}
+  .mob-nav-btn{font-size:8.5px}
+}
 </style>
 </head>
 <body>
@@ -228,9 +261,41 @@ textarea{resize:vertical;min-height:78px}
 <!-- TOPBAR -->
 <div class="topbar">
   <button class="hamburger" onclick="toggleSidebar()">☰</button>
-  <div class="logo">
-    <div class="logo-icon">🎨</div>
-    <span class="logo-text">CoatCraft <span>PRO</span></span>
+  <div class="logo" onclick="showPage('dashboard')">
+    <!-- Chemistry Flask / Molecular Logo -->
+    <div class="logo-icon">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Background circle with gradient -->
+        <circle cx="20" cy="20" r="19" fill="#0e0f11" stroke="#e8a020" stroke-width="1.2"/>
+        <!-- Benzene ring / molecular hexagon -->
+        <g transform="translate(20,20)">
+          <!-- Outer hexagon ring -->
+          <polygon points="0,-11 9.5,-5.5 9.5,5.5 0,11 -9.5,5.5 -9.5,-5.5" fill="none" stroke="#e8a020" stroke-width="1.4" stroke-linejoin="round"/>
+          <!-- Alternating double bond arcs (benzene style inner ring) -->
+          <circle cx="0" cy="0" r="6.5" fill="none" stroke="#e8a020" stroke-width="1.1" stroke-dasharray="5 3.5" stroke-dashoffset="1"/>
+          <!-- Center atom -->
+          <circle cx="0" cy="0" r="1.8" fill="#e8a020"/>
+          <!-- Bond lines from vertices to center hint -->
+          <line x1="0" y1="-11" x2="0" y2="-6.8" stroke="#e8a020" stroke-width="1" opacity="0.5"/>
+          <line x1="9.5" y1="-5.5" x2="5.9" y2="-3.4" stroke="#e8a020" stroke-width="1" opacity="0.5"/>
+          <line x1="9.5" y1="5.5" x2="5.9" y2="3.4" stroke="#e8a020" stroke-width="1" opacity="0.5"/>
+          <line x1="0" y1="11" x2="0" y2="6.8" stroke="#e8a020" stroke-width="1" opacity="0.5"/>
+          <line x1="-9.5" y1="5.5" x2="-5.9" y2="3.4" stroke="#e8a020" stroke-width="1" opacity="0.5"/>
+          <line x1="-9.5" y1="-5.5" x2="-5.9" y2="-3.4" stroke="#e8a020" stroke-width="1" opacity="0.5"/>
+          <!-- Small atoms at vertices (chemical nodes) -->
+          <circle cx="0" cy="-11" r="1.5" fill="#1e2128" stroke="#e8a020" stroke-width="1"/>
+          <circle cx="9.5" cy="-5.5" r="1.5" fill="#1e2128" stroke="#e8a020" stroke-width="1"/>
+          <circle cx="9.5" cy="5.5" r="1.5" fill="#1e2128" stroke="#e8a020" stroke-width="1"/>
+          <circle cx="0" cy="11" r="1.5" fill="#1e2128" stroke="#e8a020" stroke-width="1"/>
+          <circle cx="-9.5" cy="5.5" r="1.5" fill="#1e2128" stroke="#e8a020" stroke-width="1"/>
+          <circle cx="-9.5" cy="-5.5" r="1.5" fill="#1e2128" stroke="#e8a020" stroke-width="1"/>
+        </g>
+      </svg>
+    </div>
+    <div class="logo-text-wrap logo-text">
+      <div class="logo-title">CoatCraft <span>PRO</span></div>
+      <div class="logo-creator">by <em>Harish Churathil</em></div>
+    </div>
   </div>
   <div class="tdivider"></div>
   <div class="nav-tabs">
@@ -290,6 +355,15 @@ textarea{resize:vertical;min-height:78px}
   <div class="main" id="main"></div>
 </div>
 
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mob-nav" id="mob-nav">
+  <button class="mob-nav-btn active" id="mnav-dashboard" onclick="showPage('dashboard')"><span class="mn-icon">🏠</span>Home</button>
+  <button class="mob-nav-btn" id="mnav-formulations" onclick="showPage('formulations')"><span class="mn-icon">🧪</span>Formulas</button>
+  <button class="mob-nav-btn" id="mnav-batches" onclick="showPage('batches')"><span class="mn-icon">📋</span>Batches</button>
+  <button class="mob-nav-btn" id="mnav-ingredients" onclick="showPage('ingredients')"><span class="mn-icon">⚗️</span>Materials</button>
+  <button class="mob-nav-btn" id="mnav-qc" onclick="showPage('qc')"><span class="mn-icon">✅</span>QC</button>
+</nav>
+
 <!-- TOASTS -->
 <div class="toast-c" id="toast-c"></div>
 
@@ -336,8 +410,53 @@ textarea{resize:vertical;min-height:78px}
   </div>
 </div>
 
-<!-- HIDDEN FILE INPUT for import -->
-<input type="file" id="fi-import" accept=".json" style="display:none" onchange="previewImport(this)">
+<!-- EXCEL IMPORT MODAL -->
+<div class="mo" id="mo-xl">
+  <div class="modal" style="max-width:700px;max-height:90vh;display:flex;flex-direction:column">
+    <div class="modal-title">📊 Import Formulation from Excel</div>
+    <div style="overflow-y:auto;flex:1">
+      <div class="info-banner" style="margin-bottom:14px">
+        Upload an Excel file (.xlsx / .xls / .csv). The app will read each sheet as a separate formulation — <strong>one sheet per formula</strong>. Each sheet needs columns for ingredient name, amount, and optionally role and cost.
+      </div>
+
+      <!-- Step 1: Upload -->
+      <div id="xl-step1">
+        <div style="border:2px dashed var(--border2);border-radius:var(--radius);padding:28px;text-align:center;margin-bottom:16px;cursor:pointer;transition:border-color .2s" id="xl-dropzone" onclick="document.getElementById('xl-file').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor='var(--border2)'" ondrop="xlDrop(event)">
+          <div style="font-size:36px;margin-bottom:10px">📂</div>
+          <div style="font-weight:600;font-size:15px;color:var(--text);margin-bottom:6px">Drop Excel file here or click to browse</div>
+          <div style="font-size:12px;color:var(--text3)">Supports .xlsx, .xls, .csv — multiple sheets supported</div>
+          <input type="file" id="xl-file" accept=".xlsx,.xls,.csv" style="display:none" onchange="xlLoad(this)">
+        </div>
+
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:16px">
+          <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">📋 Expected Excel Format</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.8">
+            Column headers the app recognises (any order, case-insensitive):<br>
+            <span style="color:var(--accent);font-weight:600">Ingredient / Raw Material / Material / Name</span> — ingredient name (required)<br>
+            <span style="color:var(--accent);font-weight:600">Amount / Qty / Quantity / Parts / %</span> — amount value (required)<br>
+            <span style="color:var(--accent);font-weight:600">Unit</span> — unit of measure (optional, defaults to %)<br>
+            <span style="color:var(--accent);font-weight:600">Role / Function / Type / Category</span> — functional role (optional)<br>
+            <span style="color:var(--accent);font-weight:600">Cost / Price / Rate / Cost/kg / AED</span> — cost per unit (optional)<br>
+            <span style="color:var(--text3)">Sheet name = Formulation name. Works with your existing notebooks format.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Preview -->
+      <div id="xl-step2" style="display:none">
+        <div id="xl-sheets-tabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px"></div>
+        <div id="xl-preview-area"></div>
+        <div id="xl-map-area" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <div id="xl-actions" style="display:flex;gap:8px;justify-content:flex-end;padding-top:14px;border-top:1px solid var(--border);margin-top:auto;flex-wrap:wrap">
+      <button class="btn bs" onclick="xlReset()">🔄 Start Over</button>
+      <button class="btn bs" onclick="closeMo('mo-xl')">Close</button>
+      <button class="btn bp" id="xl-import-btn" onclick="xlImport()" disabled style="min-width:160px">⬆️ Import Formulations</button>
+    </div>
+  </div>
+</div>
 
 <script>
 'use strict';
@@ -475,33 +594,22 @@ function setupIcons(){
   }catch(e){return null}
 }
 
-// Register inline Service Worker (required for PWA install on all platforms)
+// Register Service Worker — only works when deployed to HTTPS with a real file path.
+// For single-file local usage, SW is gracefully skipped (app still works fully).
 function registerSW(){
   if(!('serviceWorker' in navigator))return;
-  const swCode=`
-const CACHE='coatcraft-v2';
-const ASSETS=[self.location.origin+self.location.pathname];
-self.addEventListener('install',e=>{
-  e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).catch(()=>{}));
-  self.skipWaiting();
-});
-self.addEventListener('activate',e=>{
-  e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
-  self.clients.claim();
-});
-self.addEventListener('fetch',e=>{
-  if(e.request.method!=='GET')return;
-  e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(resp=>{
-    if(resp.ok){const cl=resp.clone();caches.open(CACHE).then(c=>c.put(e.request,cl));}
-    return resp;
-  }).catch(()=>caches.match(e.request))));
-});
-  `;
-  const blob=new Blob([swCode],{type:'application/javascript'});
-  const swURL=URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swURL,{scope:'./'})
-    .then(()=>console.log('CoatCraft SW registered'))
-    .catch(e=>console.warn('SW registration failed:',e));
+
+  const proto=window.location.protocol;
+  // SW requires a real HTTP/HTTPS origin — skip silently for file:// or blob: contexts
+  if(proto==='file:'||proto==='blob:'||proto==='about:')return;
+
+  // Try to register sw.js from the same directory as this page.
+  // When deploying to GitHub Pages or Netlify, upload sw.js alongside index.html.
+  navigator.serviceWorker.register('./sw.js')
+    .then(reg=>console.log('CoatCraft SW registered:',reg.scope))
+    .catch(()=>{
+      // sw.js not found — single-file deploy without SW, app still works fine
+    });
 }
 
 // Inject Web App Manifest dynamically
@@ -619,10 +727,7 @@ function checkInstallPrompt(){
 function initPWA(){
   const iconPng=setupIcons();
   setupManifest(iconPng);
-  // Only register SW when served over HTTP/S (not file://)
-  if(window.location.protocol!=='file:'){
-    registerSW();
-  }
+  registerSW(); // Self-guards against unsupported protocols
   checkInstallPrompt();
 }
 
@@ -815,12 +920,31 @@ function pdfOpen(title,bodyHtml){
     </div>
   </div>`;
   const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>${PDF_CSS}</style></head><body>
-    <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    <div class="pdf-toolbar no-print">
+      <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+      <button class="close-btn" onclick="window.close()">✕ Close &amp; Return to App</button>
+    </div>
     ${header}${bodyHtml}
+    <style>
+      .pdf-toolbar{display:flex;gap:10pt;align-items:center;margin-bottom:16pt;flex-wrap:wrap}
+      .close-btn{background:#333;color:#fff;border:none;padding:9pt 20pt;border-radius:6pt;font-size:11pt;font-weight:600;cursor:pointer}
+      .close-btn:hover{background:#555}
+      @media print{.no-print{display:none!important}}
+    </style>
+    <script>
+      // If opened as popup, close brings user back. If opened as new tab, go back in history.
+      document.querySelector('.close-btn').addEventListener('click',function(){
+        if(window.opener&&!window.opener.closed){window.close();}
+        else if(history.length>1){history.back();}
+        else{window.close();}
+      });
+    <\/script>
   </body></html>`;
-  const w=window.open('','_blank','width=900,height=750,scrollbars=yes');
-  if(!w){toast('Allow popups to open the PDF viewer.','error');return;}
+  const w=window.open('','_blank','width=960,height=800,scrollbars=yes,resizable=yes');
+  if(!w){toast('Allow popups to open PDF viewer — check address bar.','error');return;}
   w.document.write(html);w.document.close();
+  // Re-focus the main app window so it's easy to return
+  window.focus();
 }
 
 function exportFormulationPDF(id){
@@ -1139,30 +1263,64 @@ function exportIngredientsPDF(){
 let page='dashboard',cItem=null,vMode='list';
 function showPage(p,id,mode){
   page=p;cItem=id||null;vMode=id?(mode||'detail'):'list';
+  // Desktop tabs
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   const tab=document.getElementById('tab-'+p);if(tab)tab.classList.add('active');
+  // Mobile bottom nav
+  document.querySelectorAll('.mob-nav-btn').forEach(t=>t.classList.remove('active'));
+  const mbtn=document.getElementById('mnav-'+p);if(mbtn)mbtn.classList.add('active');
   renderSidebar();renderMain();closeSidebar();
+  document.getElementById('main').scrollTop=0;
 }
+// Build a mobile breadcrumb back bar injected at top of detail/form views
+function mobileBackBar(label,backFn){
+  return`<div class="breadcrumb-bar">
+    <button class="bc-back" onclick="${backFn}">‹ Back</button>
+    <span class="bc-sep">|</span>
+    <span class="bc-current">${label}</span>
+  </div>`;
+}
+
 function renderMain(){
   const mc=document.getElementById('main');
   if(page==='dashboard'){mc.innerHTML=renderDash();return}
   if(page==='formulations'){
-    if(vMode==='form'){mc.innerHTML=renderFForm(cItem);initPI(cItem);return}
-    if(vMode==='detail'&&cItem){mc.innerHTML=renderFDetail(cItem);return}
+    if(vMode==='form'){
+      const label=cItem?'Edit Formulation':'New Formulation';
+      mc.innerHTML=mobileBackBar(label,"vMode='list';renderMain()")+renderFForm(cItem);
+      initPI(cItem);return;
+    }
+    if(vMode==='detail'&&cItem){
+      const f=gF().find(x=>x.id===cItem);
+      mc.innerHTML=mobileBackBar(f?.name||'Formulation',"vMode='list';cItem=null;renderMain()")+renderFDetail(cItem);return;
+    }
     mc.innerHTML=renderFList();return;
   }
   if(page==='batches'){
-    if(vMode==='form'){mc.innerHTML=renderBForm(cItem);return}
-    if(vMode==='detail'&&cItem){mc.innerHTML=renderBDetail(cItem);return}
+    if(vMode==='form'){
+      const label=cItem?'Edit Batch':'New Batch Card';
+      mc.innerHTML=mobileBackBar(label,"vMode='list';renderMain()")+renderBForm(cItem);return;
+    }
+    if(vMode==='detail'&&cItem){
+      const b=gB().find(x=>x.id===cItem);
+      mc.innerHTML=mobileBackBar(b?.batchNo||'Batch',"vMode='list';cItem=null;renderMain()")+renderBDetail(cItem);return;
+    }
     mc.innerHTML=renderBList();return;
   }
   if(page==='ingredients'){
-    if(vMode==='form'){mc.innerHTML=renderIForm(cItem);return}
+    if(vMode==='form'){
+      mc.innerHTML=mobileBackBar('Ingredient',"vMode='list';renderMain()")+renderIForm(cItem);return;
+    }
     mc.innerHTML=renderIList();return;
   }
   if(page==='qc'){
-    if(vMode==='form'){mc.innerHTML=renderQForm(cItem);return}
-    if(vMode==='detail'&&cItem){mc.innerHTML=renderQDetail(cItem);return}
+    if(vMode==='form'){
+      mc.innerHTML=mobileBackBar('QC Record',"vMode='list';renderMain()")+renderQForm(cItem);return;
+    }
+    if(vMode==='detail'&&cItem){
+      const q=gQ().find(x=>x.id===cItem);
+      mc.innerHTML=mobileBackBar(q?.batchNo||'QC Record',"vMode='list';cItem=null;renderMain()")+renderQDetail(cItem);return;
+    }
     mc.innerHTML=renderQList();return;
   }
 }
@@ -1234,7 +1392,8 @@ function renderFList(){
     <div><div class="dt">Formulations</div><div class="ds">${fo.length} formula${fo.length!==1?'s':''} on file</div></div>
     <div class="da no-print">
       <button class="btn bp" onclick="cItem=null;vMode='form';renderMain()">+ New Formula</button>
-      <button class="btn bpur" onclick="openXfer()">📦 Export / Import</button>
+      <button class="btn" style="background:var(--green-dim);color:var(--green);border:1px solid rgba(62,207,142,.3)" onclick="openXlImport()">📊 Import Excel</button>
+      <button class="btn bpur" onclick="openXfer()">📦 Export / Import JSON</button>
     </div>
   </div>
   <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Type</th><th>Finish</th><th>Category</th><th>Version</th><th>Created</th><th>Ingredients</th></tr></thead><tbody>
@@ -1291,7 +1450,7 @@ function batchesFor(fid){
 
 // ── Formulation Form ──
 let PI=[];
-const ROLES=['Pigment','Binder','Solvent','Extender','Thickener','Defoamer','Surfactant','Preservative','Drier','Coalescing Aid','Curing Agent','pH Adjuster','Additive','Other'];
+const ROLES=['Pigment','Binder','Solvent','Extender','Thickener','Defoamer','Surfactant','Preservative','Biocide','Cement','Drier','Coalescing Aid','Curing Agent','pH Adjuster','Additive','Other'];
 const UNITS=['%','g','kg','L','mL','parts'];
 function initPI(id){const f=id?gF().find(x=>x.id===id):null;PI=f?JSON.parse(JSON.stringify(f.ingredients)):[{id:DB.id(),name:'',role:'Pigment',amount:'',unit:'%',cost:''}]}
 
@@ -1302,8 +1461,8 @@ function renderFForm(id){
     <div class="f-panel-title">Basic Information</div>
     <div class="f-grid">
       <div class="fg full"><label>Formula Name *</label><input id="fn" value="${esc(f?.name||'')}" placeholder="e.g. Premium Interior Latex — White"></div>
-      <div class="fg"><label>Type</label><select id="ft">${['Interior Paint','Exterior Paint','Primer','Topcoat','Varnish','Lacquer','Stain','Sealant','Floor Coating','Roof Coating','Other'].map(t=>`<option${f?.type===t?' selected':''}>${t}</option>`).join('')}</select></div>
-      <div class="fg"><label>Finish</label><select id="ff">${['Flat','Matte','Eggshell','Satin','Semi-Gloss','Gloss','High-Gloss'].map(t=>`<option${f?.finish===t?' selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="fg"><label>Type</label><select id="ft">${['Interior Paint','Exterior Paint','Primer','Topcoat','Render','Waterproofing','Mortar','Stucco','Adhesives','Texture Coat','Mastics','Varnish','Lacquer','Stain','Sealant','Floor Coating','Roof Coating','Other'].map(t=>`<option${f?.type===t?' selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="fg"><label>Finish</label><select id="ff">${['Flat','Matte','Texture','Smooth','Fine','Eggshell','Satin','Semi-Gloss','Gloss','High-Gloss'].map(t=>`<option${f?.finish===t?' selected':''}>${t}</option>`).join('')}</select></div>
       <div class="fg"><label>Category</label><select id="fcat">${['Architectural','Industrial','Marine','Automotive','Decorative','Other'].map(t=>`<option${f?.category===t?' selected':''}>${t}</option>`).join('')}</select></div>
       <div class="fg"><label>Version</label><input id="fv" value="${esc(f?.version||'1.0')}"></div>
       <div class="fg"><label>Date Created</label><input type="date" id="fcr" value="${f?.created||today()}"></div>
@@ -1618,6 +1777,205 @@ function saveQForm(id){
   sQ(qcs);cItem=obj.id;vMode='detail';renderSidebar();renderMain();toast('QC record saved!','success');
 }
 function editQ(id){cItem=id;vMode='form';renderMain()}
+
+// ════════════════════════════════════
+// EXCEL IMPORT — SheetJS powered
+// ════════════════════════════════════
+let xlParsed=[];   // [{sheetName, headers, rows, mappedIngredients, selected}]
+
+function openXlImport(){xlReset();openMo('mo-xl')}
+
+function xlReset(){
+  xlParsed=[];
+  document.getElementById('xl-step1').style.display='block';
+  document.getElementById('xl-step2').style.display='none';
+  document.getElementById('xl-import-btn').disabled=true;
+  document.getElementById('xl-file').value='';
+  document.getElementById('xl-dropzone').style.borderColor='var(--border2)';
+}
+
+function xlDrop(e){
+  e.preventDefault();
+  document.getElementById('xl-dropzone').style.borderColor='var(--border2)';
+  const f=e.dataTransfer.files[0];
+  if(f)xlProcess(f);
+}
+
+function xlLoad(input){
+  if(input.files[0])xlProcess(input.files[0]);
+}
+
+function xlProcess(file){
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      if(typeof XLSX==='undefined'){toast('Excel library not loaded yet — try again in a moment.','error');return;}
+      const data=new Uint8Array(e.target.result);
+      const wb=XLSX.read(data,{type:'array'});
+      xlParsed=[];
+      wb.SheetNames.forEach(name=>{
+        const ws=wb.Sheets[name];
+        const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+        if(rows.length<2)return; // skip empty sheets
+        const parsed=xlParseSheet(name,rows);
+        if(parsed)xlParsed.push(parsed);
+      });
+      if(!xlParsed.length){
+        toast('No usable formulation data found. Check your Excel format.','error');return;
+      }
+      document.getElementById('xl-step1').style.display='none';
+      document.getElementById('xl-step2').style.display='block';
+      document.getElementById('xl-import-btn').disabled=false;
+      xlRenderPreview();
+      toast(`Found ${xlParsed.length} sheet${xlParsed.length>1?'s':''} — review and import below.`,'success');
+    }catch(err){
+      console.error(err);
+      toast('Error reading file: '+err.message,'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// Smart column name detector
+const COL_MAP={
+  name:['ingredient','raw material','material','name','component','chemical','substance','item'],
+  amount:['amount','qty','quantity','parts','percentage','%','wt%','weight%','w%','dosage','level','loading'],
+  unit:['unit','uom','measure'],
+  role:['role','function','type','category','purpose','class','functional'],
+  cost:['cost','price','rate','cost/kg','cost/unit','aed','$/kg','price/kg','unit cost','unit price']
+};
+
+function xlFindCol(headers,type){
+  const terms=COL_MAP[type];
+  for(let i=0;i<headers.length;i++){
+    const h=String(headers[i]||'').toLowerCase().trim();
+    if(terms.some(t=>h.includes(t)))return i;
+  }
+  return -1;
+}
+
+function xlParseSheet(name,rows){
+  // Find header row — look at first 5 rows
+  let hRow=-1,headers=[];
+  for(let r=0;r<Math.min(5,rows.length);r++){
+    const nameCol=xlFindCol(rows[r],'name');
+    const amtCol=xlFindCol(rows[r],'amount');
+    if(nameCol>=0&&amtCol>=0){hRow=r;headers=rows[r].map(h=>String(h||'').trim());break;}
+  }
+  if(hRow<0){
+    // Try heuristic: assume first row with 2+ non-empty cells and text is header
+    for(let r=0;r<Math.min(8,rows.length);r++){
+      const nonEmpty=rows[r].filter(c=>c!=='').length;
+      if(nonEmpty>=2){hRow=r;headers=rows[r].map(h=>String(h||'').trim());break;}
+    }
+  }
+  if(hRow<0)return null;
+
+  const nameIdx=xlFindCol(headers,'name');
+  const amtIdx=xlFindCol(headers,'amount');
+  if(nameIdx<0||amtIdx<0)return null;
+  const unitIdx=xlFindCol(headers,'unit');
+  const roleIdx=xlFindCol(headers,'role');
+  const costIdx=xlFindCol(headers,'cost');
+
+  const ingredients=[];
+  for(let r=hRow+1;r<rows.length;r++){
+    const row=rows[r];
+    const ingName=String(row[nameIdx]||'').trim();
+    if(!ingName||ingName.toLowerCase().includes('total')||ingName.toLowerCase().includes('sum'))continue;
+    const amt=parseFloat(String(row[amtIdx]||'').replace(/[^\d.-]/g,''))||0;
+    if(amt<=0&&!ingName)continue;
+    const unit=unitIdx>=0?String(row[unitIdx]||'%').trim()||'%':'%';
+    const role=roleIdx>=0?String(row[roleIdx]||'Other').trim()||'Other':'Other';
+    const cost=costIdx>=0?parseFloat(String(row[costIdx]||'0').replace(/[^\d.-]/g,''))||0:0;
+    if(ingName)ingredients.push({id:DB.id(),name:ingName,role,amount:amt,unit,cost});
+  }
+  if(!ingredients.length)return null;
+  return{sheetName:name,headers,hRow,rows,nameIdx,amtIdx,unitIdx,roleIdx,costIdx,ingredients,selected:true};
+}
+
+let xlActiveTab=0;
+function xlRenderPreview(){
+  // Tabs
+  const tabsEl=document.getElementById('xl-sheets-tabs');
+  tabsEl.innerHTML=xlParsed.map((s,i)=>`
+    <div style="display:flex;align-items:center;gap:6px">
+      <label style="display:flex;align-items:center;gap:5px;cursor:pointer;background:${i===xlActiveTab?'var(--accent-dim)':'var(--surface2)'};border:1px solid ${i===xlActiveTab?'var(--accent)':'var(--border)'};border-radius:var(--radius-sm);padding:6px 12px;font-size:12px;font-weight:600">
+        <input type="checkbox" ${s.selected?'checked':''} onchange="xlParsed[${i}].selected=this.checked;xlRenderPreview()" style="accent-color:var(--accent)">
+        <span onclick="xlActiveTab=${i};xlRenderPreview()" style="color:${i===xlActiveTab?'var(--accent)':'var(--text2)'}">${esc(s.sheetName)}</span>
+        <span style="color:var(--text3);font-weight:400">(${s.ingredients.length} ingredients)</span>
+      </label>
+    </div>`).join('');
+
+  const s=xlParsed[xlActiveTab];
+  if(!s){document.getElementById('xl-preview-area').innerHTML='';return;}
+  const tot=s.ingredients.reduce((a,i)=>a+i.amount,0);
+  document.getElementById('xl-preview-area').innerHTML=`
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">
+      Preview: <span style="color:var(--text)">${esc(s.sheetName)}</span>
+      &nbsp;·&nbsp; ${s.ingredients.length} ingredients
+      &nbsp;·&nbsp; Total: <span style="color:var(--accent)">${tot.toFixed(2)}%</span>
+    </div>
+    <div class="tbl-wrap" style="max-height:240px;overflow-y:auto">
+      <table><thead><tr>
+        <th style="width:20px">#</th>
+        <th>Ingredient Name</th>
+        <th>Role</th>
+        <th>Amount</th>
+        <th>Unit</th>
+        <th>Cost/Unit (AED)</th>
+      </tr></thead><tbody>
+        ${s.ingredients.map((ing,idx)=>`<tr>
+          <td style="color:var(--text3)">${idx+1}</td>
+          <td><strong>${esc(ing.name)}</strong></td>
+          <td><span class="tag">${esc(ing.role)}</span></td>
+          <td style="font-family:'DM Mono',monospace">${ing.amount}</td>
+          <td>${esc(ing.unit)}</td>
+          <td style="font-family:'DM Mono',monospace">${ing.cost>0?fc(ing.cost):'—'}</td>
+        </tr>`).join('')}
+      </tbody></table>
+    </div>
+    <div style="margin-top:10px;font-size:12px;color:var(--text3)">
+      ✅ Column mapping: 
+      <strong style="color:var(--text)">Name</strong>=${esc(s.headers[s.nameIdx]||'?')} &nbsp;
+      <strong style="color:var(--text)">Amount</strong>=${esc(s.headers[s.amtIdx]||'?')} &nbsp;
+      ${s.unitIdx>=0?`<strong style="color:var(--text)">Unit</strong>=${esc(s.headers[s.unitIdx]||'?')} `:''}
+      ${s.roleIdx>=0?`<strong style="color:var(--text)">Role</strong>=${esc(s.headers[s.roleIdx]||'?')} `:''}
+      ${s.costIdx>=0?`<strong style="color:var(--text)">Cost</strong>=${esc(s.headers[s.costIdx]||'?')} `:''}
+    </div>`;
+  // Update import button text
+  const selCount=xlParsed.filter(s=>s.selected).length;
+  document.getElementById('xl-import-btn').textContent=`⬆️ Import ${selCount} Formulation${selCount!==1?'s':''}`;
+  document.getElementById('xl-import-btn').disabled=selCount===0;
+}
+
+function xlImport(){
+  const toImport=xlParsed.filter(s=>s.selected);
+  if(!toImport.length){toast('No sheets selected.','error');return;}
+  const existing=gF();
+  let added=0;
+  toImport.forEach(s=>{
+    const newF={
+      id:DB.id(),
+      name:s.sheetName,
+      type:'Interior Paint',
+      finish:'Flat',
+      category:'Architectural',
+      version:'1.0',
+      created:today(),
+      notes:`Imported from Excel on ${today()}`,
+      ingredients:s.ingredients
+    };
+    existing.push(newF);
+    added++;
+  });
+  sF(existing);
+  syncIngredients();
+  closeMo('mo-xl');
+  xlReset();
+  showPage('formulations');
+  toast(`✅ Imported ${added} formulation${added!==1?'s':''} successfully!`,'success');
+}
 
 // ════════════════════════════════════
 // HELPERS
